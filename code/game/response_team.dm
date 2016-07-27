@@ -114,31 +114,14 @@ proc/trigger_armed_response_team(var/force = 0)
 
 	// there's only a certain chance a team will be sent
 	if(!prob(send_team_chance))
-		command_announcement.Announce("It would appear that an emergency response team was requested for [station_name()]. Unfortunately, we were unable to send one at this time.", "[boss_name]")
+		command_announcement.Announce("Хоть и команда быстрого реагирования была предложена для [station_name()], нам не удалось отправить вам отряд в данный момент.", "[boss_name]")
 		can_call_ert = 0 // Only one call per round, ladies.
 		return
 
-	command_announcement.Announce("It would appear that an emergency response team was requested for [station_name()]. We will prepare and send one as soon as possible.", "[boss_name]")
-	emergency_shuttle.add_can_call_predicate(new/datum/emergency_shuttle_predicate/ert())
+	command_announcement.Announce("Команда быстрого реагирования была предложена для [station_name()]. Мы готовим команду для вылета на станцию, ожидайте в ближайшее время.", "[boss_name]")
 
 	can_call_ert = 0 // Only one call per round, gentleman.
 	send_emergency_team = 1
 
 	sleep(600 * 5)
 	send_emergency_team = 0 // Can no longer join the ERT.
-
-/datum/emergency_shuttle_predicate/ert
-	var/prevent_until
-
-/datum/emergency_shuttle_predicate/ert/New()
-	..()
-	prevent_until = world.time + 30 MINUTES
-
-/datum/emergency_shuttle_predicate/ert/is_valid()
-	return world.time < prevent_until
-
-/datum/emergency_shuttle_predicate/ert/can_call(var/user)
-	if(world.time >= prevent_until)
-		return TRUE
-	user << "<span class='warning'>An emergency response team has been dispatched. Emergency shuttle requests will be denied until [station_adjusted_time(prevent_until - world.time)].</span>"
-	return FALSE

@@ -50,7 +50,7 @@
 		src.invisibility = INVISIBILITY_MAXIMUM
 		density = 0
 
-/obj/machinery/cooker/cultify()
+/obj/machinery/cooking/cultify()
 	new /obj/structure/cult/talisman(loc)
 	qdel(src)
 
@@ -131,12 +131,8 @@
 	// Make it a wood-reinforced wooden table.
 	// There are cult materials available, but it'd make the table non-deconstructable with how holotables work.
 	// Could possibly use a new material var for holographic-ness?
-	var/material/wood = get_material_by_name("wood")
-	if(material == wood && reinforced == wood)
-		return
-
-	material = wood
-	reinforced = wood
+	material = get_material_by_name("wood")
+	reinforced = get_material_by_name("wood")
 	update_desc()
 	update_connections(1)
 	update_icon()

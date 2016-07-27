@@ -2,13 +2,19 @@ var/list/global_listen_count = list()
 var/list/event_sources_count = list()
 var/list/event_listen_count = list()
 
-/proc/cleanup_events(var/source)
+/decl/observ/destroyed/raise_event()
+	. = ..()
+	if(!.)
+		return
+	var/source = args[1]
+
 	if(global_listen_count[source])
 		cleanup_global_listener(source, global_listen_count[source])
 	if(event_sources_count[source])
 		cleanup_source_listeners(source, event_sources_count[source])
 	if(event_listen_count[source])
 		cleanup_event_listener(source, event_listen_count[source])
+
 
 /decl/observ/register(var/datum/event_source, var/datum/listener, var/proc_call)
 	. = ..()
@@ -32,7 +38,7 @@ var/list/event_listen_count = list()
 	if(.)
 		global_listen_count[listener] -= 1
 
-/proc/cleanup_global_listener(listener, listen_count)
+/decl/observ/destroyed/proc/cleanup_global_listener(listener, listen_count)
 	global_listen_count -= listener
 	for(var/entry in all_observable_events.events)
 		var/decl/observ/event = entry
@@ -41,7 +47,7 @@ var/list/event_listen_count = list()
 			if(!(--listen_count))
 				return
 
-/proc/cleanup_source_listeners(event_source, source_listener_count)
+/decl/observ/destroyed/proc/cleanup_source_listeners(event_source, source_listener_count)
 	event_sources_count -= event_source
 	for(var/entry in all_observable_events.events)
 		var/decl/observ/event = entry
@@ -53,7 +59,7 @@ var/list/event_listen_count = list()
 					if(!(--source_listener_count))
 						return
 
-/proc/cleanup_event_listener(listener, listener_count)
+/decl/observ/destroyed/proc/cleanup_event_listener(listener, listener_count)
 	event_listen_count -= listener
 	for(var/entry in all_observable_events.events)
 		var/decl/observ/event = entry

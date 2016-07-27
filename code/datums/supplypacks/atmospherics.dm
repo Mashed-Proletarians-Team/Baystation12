@@ -1,6 +1,7 @@
 /decl/hierarchy/supply_pack/atmospherics
 	name = "Atmospherics"
 	containertype = /obj/structure/closet/crate/internals
+	hierarchy_type = /decl/hierarchy/supply_pack/atmospherics
 
 /decl/hierarchy/supply_pack/atmospherics/internals
 	name = "Internals crate"

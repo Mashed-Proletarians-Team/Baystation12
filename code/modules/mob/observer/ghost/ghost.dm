@@ -6,7 +6,6 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 	desc = "It's a g-g-g-g-ghooooost!" //jinkies!
 	icon = 'icons/mob/mob.dmi'
 	icon_state = "ghost"
-	appearance_flags = KEEP_TOGETHER
 	canmove = 0
 	blinded = 0
 	anchored = 1	//  don't get pushed around
@@ -36,7 +35,6 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 /mob/observer/ghost/New(mob/body)
 	see_in_dark = 100
 	verbs += /mob/observer/ghost/proc/dead_tele
-	verbs += /mob/proc/toggle_antag_pool
 
 	var/turf/T
 	if(ismob(body))
@@ -117,7 +115,10 @@ Works together with spawning an observer, noted above.
 	if(!loc) return
 	if(!client) return 0
 
-	handle_hud_glasses()
+	if(client.images.len)
+		for(var/image/hud in client.images)
+			if(copytext(hud.icon_state,1,4) == "hud")
+				client.images.Remove(hud)
 
 	if(antagHUD)
 		var/list/target_list = list()
@@ -167,6 +168,9 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 	set name = "Ghost"
 	set desc = "Relinquish your life and enter the land of the dead."
 
+	if(client && client.banprisoned)
+		return
+
 	if(stat == DEAD)
 		announce_ghost_joinleave(ghostize(1))
 	else
@@ -206,6 +210,8 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 	set category = "Ghost"
 	set name = "Re-enter Corpse"
 	if(!client)	return
+	if(client && client.banprisoned)
+		return
 	if(!(mind && mind.current && can_reenter_corpse))
 		src << "<span class='warning'>You have no body.</span>"
 		return
@@ -235,6 +241,8 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 	set desc = "Toggles Medical HUD allowing you to see how everyone is doing"
 	if(!client)
 		return
+	if(client && client.banprisoned)
+		return
 	if(medHUD)
 		medHUD = 0
 		src << "\blue <B>Medical HUD Disabled</B>"
@@ -248,6 +256,8 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 	set desc = "Toggles AntagHUD allowing you to see who is the antagonist"
 
 	if(!client)
+		return
+	if(client && client.banprisoned)
 		return
 	var/mentor = is_mentor(usr.client)
 	if(!config.antag_hud_allowed && (!client.holder || mentor))
@@ -274,6 +284,8 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 	set category = "Ghost"
 	set name = "Teleport"
 	set desc= "Teleport to a location"
+	if(client && client.banprisoned)
+		return
 	if(!isghost(usr))
 		usr << "Not when you're not dead!"
 		return
@@ -287,13 +299,13 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 	var/holyblock = 0
 
 	if(usr.invisibility <= SEE_INVISIBLE_LIVING || (usr.mind in cult.current_antagonists))
-		for(var/turf/T in get_area_turfs(thearea))
+		for(var/turf/T in get_area_turfs(thearea.type))
 			if(!T.holy)
 				L+=T
 			else
 				holyblock = 1
 	else
-		for(var/turf/T in get_area_turfs(thearea))
+		for(var/turf/T in get_area_turfs(thearea.type))
 			L+=T
 
 	if(!L || !L.len)
@@ -309,7 +321,8 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 	set category = "Ghost"
 	set name = "Follow" // "Haunt"
 	set desc = "Follow and haunt a mob."
-
+	if(client && client.banprisoned)
+		return
 	var/target = getmobs()[input]
 	if(!target) return
 	ManualFollow(target)
@@ -355,7 +368,8 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 	set category = "Ghost"
 	set name = "Jump to Mob"
 	set desc = "Teleport to a mob"
-
+	if(client && client.banprisoned)
+		return
 	if(isghost(usr)) //Make sure they're an observer!
 
 		if (!target)//Make sure we actually have a target
@@ -399,7 +413,8 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 /mob/observer/ghost/verb/analyze_air()
 	set name = "Analyze Air"
 	set category = "Ghost"
-
+	if(client && client.banprisoned)
+		return
 	if(!isghost(usr)) return
 
 	// Shamelessly copied from the Gas Analyzers
@@ -425,7 +440,8 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 /mob/observer/ghost/verb/become_mouse()
 	set name = "Become mouse"
 	set category = "Ghost"
-
+	if(client && client.banprisoned)
+		return
 	if(config.disable_player_mice)
 		src << "<span class='warning'>Spawning as a mouse is currently disabled.</span>"
 		return
@@ -460,13 +476,13 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 			host.universal_understand = 0
 		announce_ghost_joinleave(src, 0, "They are now a mouse.")
 		host.ckey = src.ckey
-		host.status_flags |= NO_ANTAG
 		host << "<span class='info'>You are now a mouse. Try to avoid interaction with players, and do not give hints away that you are more than a simple rodent.</span>"
 
 /mob/observer/ghost/verb/view_manfiest()
 	set name = "Show Crew Manifest"
 	set category = "Ghost"
-
+	if(client && client.banprisoned)
+		return
 	var/dat
 	dat += "<h4>Crew Manifest</h4>"
 	dat += data_core.get_manifest()
@@ -504,7 +520,8 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 	set category = "Ghost"
 	set name = "Write in blood"
 	set desc = "If the round is sufficiently spooky, write a short message in blood on the floor or a wall. Remember, no IC in OOC or OOC in IC."
-
+	if(client && client.banprisoned)
+		return
 	if(!(config.cult_ghostwriter))
 		src << "\red That verb is not currently permitted."
 		return
@@ -571,7 +588,7 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 /mob/observer/ghost/pointed(atom/A as mob|obj|turf in view())
 	if(!..())
 		return 0
-	usr.visible_message("<span class='deadsay'><b>[src]</b> points to [A]</span>")
+	usr.visible_message("<span class='deadsay'><b>[src]</b> указывает на [A]</span>")
 	return 1
 
 /mob/observer/ghost/proc/manifest()
@@ -602,7 +619,8 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 	set category = "Ghost"
 	set name = "Toggle Visibility"
 	set desc = "Allows you to turn (in)visible (almost) at will."
-
+	if(client && client.banprisoned)
+		return
 	if(invisibility && !(args.len && args[1]) && world.time < next_visibility_toggle)
 		src << "You must gather strength before you can turn visible again..."
 		return
@@ -621,7 +639,8 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 	set category = "Ghost"
 	set name = "Toggle Anonymous Chat"
 	set desc = "Toggles showing your key in dead chat."
-
+	if(client && client.banprisoned)
+		return
 	src.anonsay = !src.anonsay
 	if(anonsay)
 		src << "<span class='info'>Your key won't be shown when you speak in dead chat.</span>"
@@ -641,6 +660,8 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 	set name = "Toggle Ghost Vision"
 	set desc = "Toggles your ability to see things only ghosts can see, like other ghosts"
 	set category = "Ghost"
+	if(client && client.banprisoned)
+		return
 	ghostvision = !(ghostvision)
 	updateghostsight()
 	usr << "You [(ghostvision?"now":"no longer")] have ghost vision."
@@ -648,6 +669,8 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 /mob/observer/ghost/verb/toggle_darkness()
 	set name = "Toggle Darkness"
 	set category = "Ghost"
+	if(client && client.banprisoned)
+		return
 	seedarkness = !(seedarkness)
 	updateghostsight()
 
@@ -707,5 +730,16 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 	. = "<a href='byond://?src=\ref[ghost];track=\ref[target]'>follow</a>"
 	. += target.extra_ghost_link(ghost)
 
-/proc/isghostmind(var/datum/mind/player)
-	return player && !isnewplayer(player.current) && (!player.current || isghost(player.current) || (isliving(player.current) && player.current.stat == DEAD) || !player.current.client)
+/mob/observer/ghost/verb/toggle_antag_pool()
+	set name = "Toggle Add-Antag Candidacy"
+	set desc = "Toggles whether or not you will be considered a candidate by an add-antag vote."
+	set category = "Ghost"
+	if(ticker.looking_for_antags)
+		if(src.mind in ticker.antag_pool)
+			ticker.antag_pool -= src.mind
+			usr << "You have left the antag pool."
+		else
+			ticker.antag_pool += src.mind
+			usr << "You have joined the antag pool. Make sure you have the needed role set to high!"
+	else
+		usr << "The game is not currently looking for antags."

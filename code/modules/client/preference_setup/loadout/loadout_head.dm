@@ -139,10 +139,6 @@
 	display_name = "hat, bowler"
 	path = /obj/item/clothing/head/bowler
 
-/datum/gear/head/cowboy_hat
-	display_name = "hat, cowboy"
-	path = /obj/item/clothing/head/cowboy_hat
-
 /datum/gear/head/fez
 	display_name = "hat, fez"
 	path = /obj/item/clothing/head/fez
@@ -170,7 +166,7 @@
 
 /datum/gear/head/hijab/New()
 	..()
-	gear_tweaks = list(gear_tweak_free_color_choice())
+	gear_tweaks = list(gear_tweak_free_color_choice)
 
 /datum/gear/head/kippa
 	display_name = "kippa"
@@ -178,7 +174,7 @@
 
 /datum/gear/head/kippa/New()
 	..()
-	gear_tweaks = list(gear_tweak_free_color_choice())
+	gear_tweaks = list(gear_tweak_free_color_choice)
 
 /datum/gear/head/turban
 	display_name = "turban"
@@ -186,4 +182,4 @@
 
 /datum/gear/head/turban/New()
 	..()
-	gear_tweaks = list(gear_tweak_free_color_choice())
+	gear_tweaks = list(gear_tweak_free_color_choice)

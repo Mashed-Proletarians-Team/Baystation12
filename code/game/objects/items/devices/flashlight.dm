@@ -67,7 +67,7 @@
 			inspect_vision(vision, user)
 
 			user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN) //can be used offensively
-			M.flash_eyes()
+			flick("flash", M.flash)
 	else
 		return ..()
 
@@ -129,7 +129,7 @@
 	icon_state = "lamp"
 	item_state = "lamp"
 	brightness_on = 5
-	w_class = 4
+	w_class = 5
 	flags = CONDUCT
 
 	on = 1
@@ -140,7 +140,7 @@
 	desc = "A classic green-shaded desk lamp."
 	icon_state = "lampgreen"
 	item_state = "lampgreen"
-	brightness_on = 4
+	brightness_on = 5
 	light_color = "#FFC58F"
 
 /obj/item/device/flashlight/lamp/verb/toggle_light()
@@ -156,7 +156,7 @@
 /obj/item/device/flashlight/flare
 	name = "flare"
 	desc = "A red standard-issue flare. There are instructions on the side reading 'pull cord, make light'."
-	w_class = 1
+	w_class = 2.0
 	brightness_on = 8 // Pretty bright.
 	light_power = 3
 	light_color = "#e58775"

@@ -67,17 +67,18 @@
 	slowdown_per_slot[slot_wear_suit] = 0
 
 //Space pirate outfit
-/obj/item/clothing/head/helmet/pirate
+/obj/item/clothing/head/helmet/space/pirate
 	name = "pirate hat"
 	desc = "Yarr."
 	icon_state = "pirate"
 	item_state = "pirate"
 	armor = list(melee = 60, bullet = 50, laser = 30,energy = 15, bomb = 30, bio = 30, rad = 30)
+	item_flags = STOPPRESSUREDAMAGE
 	flags_inv = BLOCKHAIR
 	body_parts_covered = 0
 	siemens_coefficient = 0.9
 
-/obj/item/clothing/suit/pirate
+/obj/item/clothing/suit/space/pirate
 	name = "pirate coat"
 	desc = "Yarr."
 	icon_state = "pirate"
@@ -86,7 +87,7 @@
 	allowed = list(/obj/item/weapon/gun,/obj/item/ammo_magazine,/obj/item/ammo_casing,/obj/item/weapon/melee/baton,/obj/item/weapon/handcuffs,/obj/item/weapon/tank/emergency)
 	armor = list(melee = 60, bullet = 50, laser = 30,energy = 15, bomb = 30, bio = 30, rad = 30)
 	siemens_coefficient = 0.9
-	body_parts_covered = UPPER_TORSO|LOWER_TORSO|ARMS
+	body_parts_covered = UPPER_TORSO|ARMS
 
 /obj/item/clothing/suit/space/pirate/New()
 	..()

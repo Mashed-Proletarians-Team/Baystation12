@@ -21,7 +21,10 @@
 		name = "[material.display_name] wall"
 		desc = "It seems to be a section of hull plated with [material.display_name]."
 
-	set_opacity(material.opacity >= 0.5)
+	if(material.opacity > 0.5 && !opacity)
+		set_light(1)
+	else if(material.opacity < 0.5 && opacity)
+		set_light(0)
 
 	update_connections(1)
 	update_icon()

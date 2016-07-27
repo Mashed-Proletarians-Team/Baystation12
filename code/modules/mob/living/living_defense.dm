@@ -63,16 +63,19 @@
 /mob/living/bullet_act(var/obj/item/projectile/P, var/def_zone)
 
 	//Being hit while using a deadman switch
-	var/obj/item/device/assembly/signaler/signaler = get_active_hand()
-	if(istype(signaler) && signaler.deadman)
-		log_and_message_admins("has triggered a signaler deadman's switch")
-		src.visible_message("<span class='warning'>[src] triggers their deadman's switch!</span>")
-		signaler.signal()
+	if(istype(get_active_hand(),/obj/item/device/assembly/signaler))
+		var/obj/item/device/assembly/signaler/signaler = get_active_hand()
+		if(signaler.deadman && prob(80))
+			log_and_message_admins("has triggered a signaler deadman's switch")
+			src.visible_message("\red [src] triggers their deadman's switch!")
+			signaler.signal()
 
 	//Stun Beams
 	if(P.taser_effect)
 		stun_effect_act(0, P.agony, def_zone, P)
-		//src <<"<span class='warning'>You have been hit by [P]!</span>"
+		src <<"\red You have been hit by [P]!"
+		qdel(P)
+		return
 
 	//Armor
 	var/absorb = run_armor_check(def_zone, P.check_armour, P.armor_penetration)
@@ -273,11 +276,8 @@
 		ExtinguishMob() //Fire's been put out.
 		return 1
 
-	if(HUSK in mutations)
-		fire_stacks = max(0, fire_stacks - 0.1) //I guess the fire runs out of fuel eventually
-
 	var/datum/gas_mixture/G = loc.return_air() // Check if we're standing in an oxygenless environment
-	if(G.get_by_flag(XGM_GAS_OXIDIZER) < 1)
+	if(G.gas["oxygen"] < 1)
 		ExtinguishMob() //If there's no oxygen in the tile we're on, put out the fire
 		return 1
 

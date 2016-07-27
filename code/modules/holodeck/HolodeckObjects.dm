@@ -214,7 +214,6 @@
 	no_attack_log = 1
 
 /obj/item/weapon/holo/esword
-	name = "holosword"
 	desc = "May the force be within you. Sorta."
 	icon_state = "sword0"
 	force = 3.0
@@ -263,7 +262,10 @@
 		playsound(user, 'sound/weapons/saberoff.ogg', 50, 1)
 		user << "<span class='notice'>[src] can now be concealed.</span>"
 
-	update_held_icon()
+	if(istype(user,/mob/living/carbon/human))
+		var/mob/living/carbon/human/H = user
+		H.update_inv_l_hand()
+		H.update_inv_r_hand()
 
 	add_fingerprint(user)
 	return
@@ -276,7 +278,7 @@
 	name = "basketball"
 	item_state = "basketball"
 	desc = "Here's your chance, do your dance at the Space Jam."
-	w_class = 4 //Stops people from hiding it in their pockets
+	w_class = 5 //Stops people from hiding it in their bags/pockets
 
 /obj/structure/holohoop
 	name = "basketball hoop"

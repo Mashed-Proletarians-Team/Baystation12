@@ -9,10 +9,6 @@
 	var/beat_sound = 'sound/effects/singlebeat.ogg'
 	var/efficiency = 1
 
-/obj/item/organ/heart/robotize()
-	. = ..()
-	icon_state = "heart-prosthetic"
-
 /obj/item/organ/heart/process()
 	if(owner)
 		handle_pulse()
@@ -51,7 +47,7 @@
 /obj/item/organ/heart/proc/handle_blood()
 	if(!owner)
 		return
-	if(owner.stat == DEAD || owner.bodytemperature < 170)	//Dead or cryosleep people do not pump the blood.
+	if(owner.stat == DEAD && owner.bodytemperature >= 170)	//Dead or cryosleep people do not pump the blood.
 		return
 
 	var/blood_volume_raw = owner.vessel.get_reagent_amount("blood")
@@ -88,8 +84,7 @@
 			if(prob(15))
 				owner << "<span class='warning'>You feel extremely [pick("dizzy","woosey","faint")]</span>"
 		else if(blood_volume < BLOOD_VOLUME_SURVIVE)
-			owner.setOxyLoss(max(owner.getOxyLoss(), owner.maxHealth))
-			owner.adjustOxyLoss(10)
+			owner.death()
 
 	//Blood regeneration if there is some space
 	if(blood_volume_raw < species.blood_volume)
@@ -104,3 +99,28 @@
 			owner.nutrition -= 10
 		else if(owner.nutrition >= 200)
 			owner.nutrition -= 3
+
+/obj/item/organ/lungs
+	name = "lungs"
+	icon_state = "lungs"
+	gender = PLURAL
+	organ_tag = "lungs"
+	parent_organ = "chest"
+
+/obj/item/organ/lungs/process()
+	..()
+
+	if(!owner)
+		return
+
+	if (germ_level > INFECTION_LEVEL_ONE)
+		if(prob(5))
+			owner.emote("cough")		//respitory tract infection
+
+	if(is_bruised())
+		if(prob(2))
+			spawn owner.emote("me", 1, "coughs up blood!")
+			owner.drip(10)
+		if(prob(4))
+			spawn owner.emote("me", 1, "gasps for air!")
+			owner.losebreath += 15

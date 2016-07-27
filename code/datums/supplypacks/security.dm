@@ -1,5 +1,6 @@
 /decl/hierarchy/supply_pack/security
 	name = "Security"
+	hierarchy_type = /decl/hierarchy/supply_pack/security
 
 /decl/hierarchy/supply_pack/security/specialops
 	name = "Special Ops supplies"
@@ -53,7 +54,6 @@
 /decl/hierarchy/supply_pack/security/eweapons
 	name = "Advanced Energy Weapons crate"
 	contains = list(/obj/item/weapon/gun/energy/xray = 2,
-					/obj/item/weapon/gun/energy/xray/pistol = 1,
 					/obj/item/weapon/shield/energy = 2,
 					/obj/item/clothing/suit/armor/laserproof = 2)
 	cost = 125
@@ -64,11 +64,12 @@
 /decl/hierarchy/supply_pack/security/armor
 	num_contained = 5
 	contains = list(/obj/item/clothing/suit/armor/vest,
-					/obj/item/clothing/suit/armor/vest/nt,
+					/obj/item/clothing/suit/armor/vest/security,
 					/obj/item/clothing/suit/armor/vest/detective,
-					/obj/item/clothing/suit/storage/vest/nt/hos,
+					/obj/item/clothing/suit/storage/vest/hos,
 					/obj/item/clothing/suit/storage/vest/pcrc,
-					/obj/item/clothing/suit/storage/vest/nt/warden,
+					/obj/item/clothing/suit/storage/vest/warden,
+					/obj/item/clothing/suit/storage/vest/officer,
 					/obj/item/clothing/suit/storage/vest)
 
 	name = "Armor crate"
@@ -230,7 +231,7 @@
 					/obj/item/device/camera,
 					/obj/item/weapon/folder/red,
 					/obj/item/weapon/folder/blue,
-					/obj/item/clothing/gloves/forensic,
+					/obj/item/clothing/gloves/black,
 					/obj/item/device/taperecorder,
 					/obj/item/device/mass_spectrometer,
 					/obj/item/device/camera_film = 2,
@@ -254,7 +255,6 @@
 					/obj/item/clothing/suit/storage/det_trench/grey,
 					/obj/item/clothing/suit/storage/forensics/red,
 					/obj/item/clothing/suit/storage/forensics/blue,
-					/obj/item/clothing/gloves/forensic,
 					/obj/item/clothing/gloves/black = 2)
 	cost = 20
 	containertype = /obj/structure/closet/crate/secure
@@ -263,7 +263,7 @@
 
 /decl/hierarchy/supply_pack/security/officergear
 	name = "Officer equipment"
-	contains = list(/obj/item/clothing/suit/storage/vest/nt,
+	contains = list(/obj/item/clothing/suit/storage/vest/officer,
 					/obj/item/clothing/head/helmet,
 					/obj/item/weapon/cartridge/security,
 					/obj/item/clothing/accessory/badge/holo,
@@ -290,7 +290,7 @@
 
 /decl/hierarchy/supply_pack/security/wardengear
 	name = "Warden equipment"
-	contains = list(/obj/item/clothing/suit/storage/vest/nt/warden,
+	contains = list(/obj/item/clothing/suit/storage/vest/warden,
 					/obj/item/clothing/under/rank/warden,
 					/obj/item/clothing/under/rank/warden/corp,
 					/obj/item/clothing/suit/armor/vest/warden,
@@ -312,7 +312,7 @@
 
 /decl/hierarchy/supply_pack/security/headofsecgear
 	name = "Head of security equipment"
-	contains = list(/obj/item/clothing/suit/storage/vest/nt/hos,
+	contains = list(/obj/item/clothing/suit/storage/vest/hos,
 					/obj/item/clothing/under/rank/head_of_security/corp,
 					/obj/item/clothing/suit/armor/hos,
 					/obj/item/weapon/cartridge/hos,

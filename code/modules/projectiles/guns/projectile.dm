@@ -1,7 +1,6 @@
 #define HOLD_CASINGS	0 //do not do anything after firing. Manual action, like pump shotguns, or guns that want to define custom behaviour
-#define CLEAR_CASINGS	1 //clear chambered so that the next round will be automatically loaded and fired, but don't drop anything on the floor
-#define EJECT_CASINGS	2 //drop spent casings on the ground after firing
-#define CYCLE_CASINGS	3 //cycle casings, like a revolver. Also works for multibarrelled guns
+#define EJECT_CASINGS	1 //drop spent casings on the ground after firing
+#define CYCLE_CASINGS 	2 //experimental: cycle casings, like a revolver. Also works for multibarrelled guns
 
 /obj/item/weapon/gun/projectile
 	name = "gun"
@@ -25,12 +24,8 @@
 	//For MAGAZINE guns
 	var/magazine_type = null	//the type of magazine that the gun comes preloaded with
 	var/obj/item/ammo_magazine/ammo_magazine = null //stored magazine
-	var/allowed_magazines		//magazine types that may be loaded. Can be a list or single path
 	var/auto_eject = 0			//if the magazine should automatically eject itself when empty.
 	var/auto_eject_sound = null
-
-	var/is_jammed = 0           //Whether this gun is jammed
-	var/jam_chance = 0          //Chance it jams on fire
 	//TODO generalize ammo icon states for guns
 	//var/magazine_states = 0
 	//var/list/icon_keys = list()		//keys
@@ -46,11 +41,6 @@
 	update_icon()
 
 /obj/item/weapon/gun/projectile/consume_next_projectile()
-	if(!is_jammed && prob(jam_chance))
-		src.visible_message("<span class='danger'>\The [src] jams!</span>")
-		is_jammed = 1
-	if(is_jammed)
-		return null
 	//get the next casing
 	if(loaded.len)
 		chambered = loaded[1] //load next casing.
@@ -101,9 +91,6 @@
 
 		switch(AM.mag_type)
 			if(MAGAZINE)
-				if((ispath(allowed_magazines) && !istype(A, allowed_magazines)) || (islist(allowed_magazines) && !is_type_in_list(A, allowed_magazines)))
-					user << "<span class='warning'>\The [A] won't fit into [src].</span>"
-					return
 				if(ammo_magazine)
 					user << "<span class='warning'>[src] already has a magazine loaded.</span>" //already a magazine here
 					return
@@ -147,12 +134,6 @@
 
 //attempts to unload src. If allow_dump is set to 0, the speedloader unloading method will be disabled
 /obj/item/weapon/gun/projectile/proc/unload_ammo(mob/user, var/allow_dump=1)
-	if(is_jammed)
-		user.visible_message("\The [user] begins to unjam [src].", "You clear the jam and unload [src]")
-		if(!do_after(user, 4, src))
-			return
-		is_jammed = 0
-		playsound(src.loc, 'sound/weapons/flipblade.ogg', 50, 1)
 	if(ammo_magazine)
 		user.put_in_hands(ammo_magazine)
 		user.visible_message("[user] removes [ammo_magazine] from [src].", "<span class='notice'>You remove [ammo_magazine] from [src].</span>")
@@ -211,8 +192,6 @@
 
 /obj/item/weapon/gun/projectile/examine(mob/user)
 	..(user)
-	if(is_jammed)
-		user << "<span class='warning'>It looks jammed.</span>"
 	if(ammo_magazine)
 		user << "It has \a [ammo_magazine] loaded."
 	user << "Has [getAmmo()] round\s remaining."

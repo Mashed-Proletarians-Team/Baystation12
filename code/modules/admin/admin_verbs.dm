@@ -89,11 +89,7 @@ var/list/admin_verbs_admin = list(
 	/client/proc/view_chemical_reaction_logs,
 	/client/proc/makePAI,
 	/datum/admins/proc/paralyze_mob,
-	/client/proc/fixatmos,
-	/client/proc/list_traders,
-	/client/proc/add_trader,
-	/client/proc/remove_trader,
-	/datum/admins/proc/sendFax
+	/client/proc/fixatmos
 )
 var/list/admin_verbs_ban = list(
 	/client/proc/unban_panel,
@@ -104,10 +100,9 @@ var/list/admin_verbs_sounds = list(
 	/client/proc/play_sound,
 	/client/proc/play_server_sound
 	)
-
 var/list/admin_verbs_fun = list(
 	/client/proc/object_talk,
-	/datum/admins/proc/cmd_admin_dress,
+	/client/proc/cmd_admin_dress,
 	/client/proc/cmd_admin_gib_self,
 	/client/proc/drop_bomb,
 	/client/proc/everyone_random,
@@ -122,9 +117,7 @@ var/list/admin_verbs_fun = list(
 	/client/proc/editappear,
 	/client/proc/roll_dices,
 	/datum/admins/proc/call_supply_drop,
-	/datum/admins/proc/call_drop_pod,
-	/client/proc/create_dungeon,
-	/datum/admins/proc/ai_hologram_set
+	/datum/admins/proc/call_drop_pod
 	)
 
 var/list/admin_verbs_spawn = list(
@@ -159,7 +152,10 @@ var/list/admin_verbs_server = list(
 	/datum/admins/proc/toggle_space_ninja,
 	/client/proc/toggle_random_events,
 	/client/proc/check_customitem_activity,
-	/client/proc/nanomapgen_DumpImage
+	/client/proc/nanomapgen_DumpImage,
+	/client/proc/adminchangebuild,
+	/client/proc/update_server,
+	/client/proc/update_server_round_end
 	)
 var/list/admin_verbs_debug = list(
 	/client/proc/getruntimelog,                     // allows us to access runtime logs to somebody,
@@ -241,7 +237,7 @@ var/list/admin_verbs_hideable = list(
 	/client/proc/play_sound,
 	/client/proc/play_server_sound,
 	/client/proc/object_talk,
-	/datum/admins/proc/cmd_admin_dress,
+	/client/proc/cmd_admin_dress,
 	/client/proc/cmd_admin_gib_self,
 	/client/proc/drop_bomb,
 	/client/proc/cinematic,
@@ -303,9 +299,7 @@ var/list/admin_verbs_mod = list(
 	/client/proc/jobbans,
 	/client/proc/cmd_admin_subtle_message, // send an message to somebody as a 'voice in their head',
 	/client/proc/aooc,
-	/datum/admins/proc/paralyze_mob,
-	/datum/admins/proc/sendFax
-
+	/datum/admins/proc/paralyze_mob
 )
 
 var/list/admin_verbs_mentor = list(

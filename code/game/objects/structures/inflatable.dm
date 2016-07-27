@@ -1,6 +1,6 @@
 /obj/item/inflatable
 	name = "inflatable"
-	w_class = 3
+	w_class = 2
 	icon = 'icons/obj/inflatable.dmi'
 	var/deploy_path = null
 
@@ -84,10 +84,12 @@
 /obj/structure/inflatable/attackby(obj/item/weapon/W as obj, mob/user as mob)
 	if(!istype(W) || istype(W, /obj/item/weapon/inflatable_dispenser)) return
 
-	if((W.damtype == BRUTE || W.damtype == BURN) && W.can_puncture())
+	if (can_puncture(W))
+		visible_message("<span class='danger'>[user] pierces [src] with [W]!</span>")
+		deflate(1)
+	if(W.damtype == BRUTE || W.damtype == BURN)
+		hit(W.force)
 		..()
-		if(hit(W.force))
-			visible_message("<span class='danger'>[user] pierces [src] with [W]!</span>")
 	return
 
 /obj/structure/inflatable/proc/hit(var/damage, var/sound_effect = 1)
@@ -96,8 +98,6 @@
 		playsound(loc, 'sound/effects/Glasshit.ogg', 75, 1)
 	if(health <= 0)
 		deflate(1)
-		return 1
-	return 0
 
 /obj/structure/inflatable/CtrlClick()
 	hand_deflate()
@@ -254,7 +254,16 @@
 	desc = "Contains inflatable walls and doors."
 	icon_state = "inf_box"
 	item_state = "syringe_kit"
-	w_class = 4
-	max_storage_space = DEFAULT_LARGEBOX_STORAGE
+	w_class = 3
+	max_storage_space = DEFAULT_BOX_STORAGE
 	can_hold = list(/obj/item/inflatable)
-	startswith = list(/obj/item/inflatable/door = 2, /obj/item/inflatable/wall = 3)
+
+	New()
+		..()
+		new /obj/item/inflatable/door(src)
+		new /obj/item/inflatable/door(src)
+		new /obj/item/inflatable/door(src)
+		new /obj/item/inflatable/wall(src)
+		new /obj/item/inflatable/wall(src)
+		new /obj/item/inflatable/wall(src)
+		new /obj/item/inflatable/wall(src)

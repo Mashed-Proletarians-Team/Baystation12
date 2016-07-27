@@ -1,11 +1,5 @@
 /datum/shuttle/ferry/emergency
-	category = /datum/shuttle/ferry/emergency
-
-/datum/shuttle/ferry/emergency/New()
-	if(emergency_shuttle.shuttle)
-		CRASH("An emergency shuttle has already been defined.")
-	emergency_shuttle.shuttle = src
-	..()
+	//pass
 
 /datum/shuttle/ferry/emergency/arrived()
 	if (istype(in_use, /obj/machinery/computer/shuttle_control/emergency))

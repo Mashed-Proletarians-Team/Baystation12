@@ -113,7 +113,7 @@
 		return
 
 	// Change the way they should download resources.
-	if(config.resource_urls && config.resource_urls.len)
+	if(config.resource_urls)
 		src.preload_rsc = pick(config.resource_urls)
 	else src.preload_rsc = 1 // If config.resource_urls is not set, preload like normal.
 
@@ -128,6 +128,13 @@
 	if(holder)
 		admins += src
 		holder.owner = src
+		var/sql_ckey = sanitizeSQL(src.ckey)
+		spawn for()
+			var/DBQuery/query_o_s_ins = dbcon.NewQuery("INSERT INTO online_score(ckey,year,month,day,sum) VALUES ('[sql_ckey]', YEAR(NOW()), MONTH(NOW()), DAYOFMONTH(NOW()), 0);")
+			query_o_s_ins.Execute()
+			var/DBQuery/query_sum_upd = dbcon.NewQuery("UPDATE online_score SET sum= sum+1 WHERE ckey='[sql_ckey]' AND year=YEAR(NOW()) AND month=MONTH(NOW()) AND day=DAYOFMONTH(NOW());")
+			query_sum_upd.Execute()
+			sleep(600)
 
 	//preferences datum - also holds some persistant data for the client (because we may as well keep these datums to a minimum)
 	prefs = preferences_datums[ckey]
@@ -136,6 +143,7 @@
 		preferences_datums[ckey] = prefs
 	prefs.last_ip = address				//these are gonna be used for banning
 	prefs.last_id = computer_id			//these are gonna be used for banning
+	prisoner_init()
 
 	. = ..()	//calls mob.Login()
 	prefs.sanitize_preferences()
@@ -165,8 +173,6 @@
 
 	if(!void)
 		void = new()
-		void = void.MakeGreed()
-
 	screen += void
 
 	if(prefs.lastchangelog != changelog_hash) //bolds the changelog button on the interface so we know there are updates.

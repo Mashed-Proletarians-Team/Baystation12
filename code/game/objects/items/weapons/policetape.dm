@@ -30,7 +30,6 @@ var/list/tape_roll_applications = list()
 	name = "tape"
 	icon = 'icons/policetape.dmi'
 	icon_state = "tape"
-	randpixel = 0
 	anchored = 1
 	var/lifted = 0
 	var/crumpled = 0
@@ -350,7 +349,7 @@ var/list/tape_roll_applications = list()
 
 
 /obj/item/tape/proc/breaktape(obj/item/weapon/W as obj, mob/user as mob)
-	if(user.a_intent == I_HELP && ((!W.can_puncture() && src.allowed(user))))
+	if(user.a_intent == I_HELP && ((!can_puncture(W) && src.allowed(user))))
 		user << "You can't break \the [src] with that!"
 		return
 	user.show_viewers("<span class='notice'>\The [user] breaks \the [src]!</span>")

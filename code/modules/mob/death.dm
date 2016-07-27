@@ -7,7 +7,7 @@
 	icon = null
 	invisibility = 101
 	update_canmove()
-	remove_from_dead_mob_list()
+	dead_mob_list -= src
 
 	var/atom/movable/overlay/animation = null
 	animation = new(loc)
@@ -41,7 +41,7 @@
 	flick(anim, animation)
 	new remains(loc)
 
-	remove_from_dead_mob_list()
+	dead_mob_list -= src
 	spawn(15)
 		if(animation)	qdel(animation)
 		if(src)			qdel(src)
@@ -66,6 +66,9 @@
 
 	layer = MOB_LAYER
 
+	if(blind && client)
+		blind.layer = 0
+
 	sight |= SEE_TURFS|SEE_MOBS|SEE_OBJS
 	see_in_dark = 8
 	see_invisible = SEE_INVISIBLE_LEVEL_TWO
@@ -76,7 +79,6 @@
 	//TODO:  Change death state to health_dead for all these icon files.  This is a stop gap.
 
 	if(healths)
-		healths.overlays = null // This is specific to humans but the relevant code is here; shouldn't mess with other mobs.
 		if("health7" in icon_states(healths.icon))
 			healths.icon_state = "health7"
 		else
@@ -85,7 +87,8 @@
 
 	timeofdeath = world.time
 	if(mind) mind.store_memory("Time of death: [stationtime2text()]", 0)
-	switch_from_living_to_dead_mob_list()
+	living_mob_list -= src
+	dead_mob_list |= src
 
 	updateicon()
 

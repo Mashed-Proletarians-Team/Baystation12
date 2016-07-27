@@ -185,10 +185,10 @@
 				my_atom.on_reagent_change()
 			return 0
 
-/datum/reagents/proc/has_reagent(var/id, var/amount = null)
+/datum/reagents/proc/has_reagent(var/id, var/amount = 0)
 	for(var/datum/reagent/current in reagent_list)
 		if(current.id == id)
-			if((isnull(amount) && current.volume > 0) || current.volume >= amount)
+			if(current.volume >= amount)
 				return 1
 			else
 				return 0

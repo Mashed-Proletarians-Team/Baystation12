@@ -33,8 +33,11 @@
 /obj/item/device/multitool/hacktool/resolve_attackby(atom/A, mob/user)
 	sanity_check()
 
-	if(!in_hack_mode || !attempt_hack(user, A)) //will still show the unable to hack message, oh well
+	if(!in_hack_mode)
 		return ..()
+
+	if(!attempt_hack(user, A))
+		return 0
 
 	A.ui_interact(user, state = hack_state)
 	return 1
@@ -42,9 +45,9 @@
 /obj/item/device/multitool/hacktool/proc/attempt_hack(var/mob/user, var/atom/target)
 	if(is_hacking)
 		user << "<span class='warning'>You are already hacking!</span>"
-		return 1
+		return 0
 	if(!is_type_in_list(target, supported_types))
-		user << "\icon[src] <span class='warning'>Unable to hack this target.</span>"
+		user << "\icon[src] <span class='warning'>Unable to hack this target!</span>"
 		return 0
 	var/found = known_targets.Find(target)
 	if(found)
@@ -60,10 +63,12 @@
 	if(hack_result && in_hack_mode)
 		user << "<span class='notice'>Your hacking attempt was succesful!</span>"
 		playsound(src.loc, 'sound/piano/A#6.ogg', 75)
-		known_targets.Insert(1, target)	// Insert the newly hacked target first,
-		destroyed_event.register(target, src, /obj/item/device/multitool/hacktool/proc/on_target_destroy)
 	else
 		user << "<span class='warning'>Your hacking attempt failed!</span>"
+		return 0
+
+	known_targets.Insert(1, target)	// Insert the newly hacked target first,
+	destroyed_event.register(target, src, /obj/item/device/multitool/hacktool/proc/on_target_destroy)
 	return 1
 
 /obj/item/device/multitool/hacktool/proc/sanity_check()

@@ -27,16 +27,16 @@
 		if(mind)
 			mind.name = real_name
 
-	hud_list[HEALTH_HUD]      = new /image/hud_overlay('icons/mob/hud_med.dmi', src, "100")
-	hud_list[STATUS_HUD]      = new /image/hud_overlay('icons/mob/hud.dmi', src, "hudhealthy")
-	hud_list[LIFE_HUD]	      = new /image/hud_overlay('icons/mob/hud.dmi', src, "hudhealthy")
-	hud_list[ID_HUD]          = new /image/hud_overlay('icons/mob/hud.dmi', src, "hudunknown")
-	hud_list[WANTED_HUD]      = new /image/hud_overlay('icons/mob/hud.dmi', src, "hudblank")
-	hud_list[IMPLOYAL_HUD]    = new /image/hud_overlay('icons/mob/hud.dmi', src, "hudblank")
-	hud_list[IMPCHEM_HUD]     = new /image/hud_overlay('icons/mob/hud.dmi', src, "hudblank")
-	hud_list[IMPTRACK_HUD]    = new /image/hud_overlay('icons/mob/hud.dmi', src, "hudblank")
-	hud_list[SPECIALROLE_HUD] = new /image/hud_overlay('icons/mob/hud.dmi', src, "hudblank")
-	hud_list[STATUS_HUD_OOC]  = new /image/hud_overlay('icons/mob/hud.dmi', src, "hudhealthy")
+	hud_list[HEALTH_HUD]      = image('icons/mob/hud.dmi', src, "hudhealth100")
+	hud_list[STATUS_HUD]      = image('icons/mob/hud.dmi', src, "hudhealthy")
+	hud_list[LIFE_HUD]	      = image('icons/mob/hud.dmi', src, "hudhealthy")
+	hud_list[ID_HUD]          = image('icons/mob/hud.dmi', src, "hudunknown")
+	hud_list[WANTED_HUD]      = image('icons/mob/hud.dmi', src, "hudblank")
+	hud_list[IMPLOYAL_HUD]    = image('icons/mob/hud.dmi', src, "hudblank")
+	hud_list[IMPCHEM_HUD]     = image('icons/mob/hud.dmi', src, "hudblank")
+	hud_list[IMPTRACK_HUD]    = image('icons/mob/hud.dmi', src, "hudblank")
+	hud_list[SPECIALROLE_HUD] = image('icons/mob/hud.dmi', src, "hudblank")
+	hud_list[STATUS_HUD_OOC]  = image('icons/mob/hud.dmi', src, "hudhealthy")
 
 	human_mob_list |= src
 	..()
@@ -88,7 +88,7 @@
 
 /mob/living/carbon/human/ex_act(severity)
 	if(!blinded)
-		flash_eyes()
+		flick("flash", flash)
 
 	var/b_loss = null
 	var/f_loss = null
@@ -219,9 +219,6 @@
 		dat += "<BR><b>Left hand:</b> <A href='?src=\ref[src];item=[slot_l_hand]'>[istype(l_hand) ? l_hand : "nothing"]</A>"
 		dat += "<BR><b>Right hand:</b> <A href='?src=\ref[src];item=[slot_r_hand]'>[istype(r_hand) ? r_hand : "nothing"]</A>"
 
-	if(suit)
-		dat += "<BR><b>Pockets:</b> <A href='?src=\ref[src];item=pockets'>Empty or Place Item</A>"
-
 	// Do they get an option to set internals?
 	if(istype(wear_mask, /obj/item/clothing/mask) || istype(head, /obj/item/clothing/head/helmet/space))
 		if(istype(back, /obj/item/weapon/tank) || istype(belt, /obj/item/weapon/tank) || istype(s_store, /obj/item/weapon/tank))
@@ -238,7 +235,8 @@
 	if(suit && suit.accessories.len)
 		dat += "<BR><A href='?src=\ref[src];item=tie'>Remove accessory</A>"
 	dat += "<BR><A href='?src=\ref[src];item=splints'>Remove splints</A>"
-	dat += "<BR><A href='?src=\ref[src];refresh=1'>Refresh</A>"
+	dat += "<BR><A href='?src=\ref[src];item=pockets'>Empty pockets</A>"
+	dat += "<BR><A href='?src=\ref[user];refresh=1'>Refresh</A>"
 	dat += "<BR><A href='?src=\ref[user];mach_close=mob[name]'>Close</A>"
 
 	user << browse(dat, text("window=mob[name];size=340x540"))
@@ -357,8 +355,8 @@
 /mob/living/carbon/human/Topic(href, href_list)
 
 	if (href_list["refresh"])
-		if(Adjacent(src, usr))
-			show_inv(usr)
+		if((machine)&&(in_range(src, usr)))
+			show_inv(machine)
 
 	if (href_list["mach_close"])
 		var/t1 = text("window=[]", href_list["mach_close"])
@@ -741,18 +739,16 @@
 			src << "<span class='warning'>You feel like you are about to throw up!</span>"
 			spawn(100)	//and you have 10 more for mad dash to the bucket
 				Stun(5)
-				if(nutrition < 40)
-					custom_emote(1,"dry heaves.")
-				else
-					src.visible_message("<span class='warning'>[src] throws up!</span>","<span class='warning'>You throw up!</span>")
-					playsound(loc, 'sound/effects/splat.ogg', 50, 1)
 
-					var/turf/location = loc
-					if (istype(location, /turf/simulated))
-						location.add_vomit_floor(src, 1)
+				src.visible_message("<span class='warning'>[src] throws up!</span>","<span class='warning'>You throw up!</span>")
+				playsound(loc, 'sound/effects/splat.ogg', 50, 1)
 
-					nutrition -= 40
-					adjustToxLoss(-3)
+				var/turf/location = loc
+				if (istype(location, /turf/simulated))
+					location.add_vomit_floor(src, 1)
+
+				nutrition -= 40
+				adjustToxLoss(-3)
 				spawn(350)	//wait 35 seconds before next volley
 					lastpuke = 0
 
@@ -946,8 +942,10 @@
 
 /mob/living/carbon/human/proc/rupture_lung()
 	var/obj/item/organ/lungs/L = internal_organs_by_name["lungs"]
-	if(L)
-		L.rupture()
+
+	if(L && !L.is_bruised())
+		src.custom_pain("You feel a stabbing pain in your chest!", 1)
+		L.bruise()
 
 /*
 /mob/living/carbon/human/verb/simulate()
@@ -1027,7 +1025,7 @@
 /mob/living/carbon/human/proc/handle_embedded_objects()
 
 	for(var/obj/item/organ/external/organ in src.organs)
-		if(organ.splinted) //Splints prevent movement.
+		if(organ.status & ORGAN_SPLINTED) //Splints prevent movement.
 			continue
 		for(var/obj/item/O in organ.implants)
 			if(!istype(O,/obj/item/weapon/implant) && prob(5)) //Moving with things stuck in you could be bad.
@@ -1131,6 +1129,7 @@
 	icon_state = lowertext(species.name)
 
 	species.create_organs(src)
+	src.sync_organ_dna()
 	species.handle_post_spawn(src)
 
 	maxHealth = species.total_health
@@ -1152,9 +1151,6 @@
 		if(hud_used)
 			qdel(hud_used)
 		hud_used = new /datum/hud(src)
-
-	if(config && config.use_cortical_stacks && client && client.prefs.has_cortical_stack)
-		create_stack()
 
 	if(species)
 		return 1
@@ -1399,18 +1395,20 @@
 /mob/living/carbon/human/put_in_hands(var/obj/item/W)
 	if(!W)
 		return 0
-	if(put_in_active_hand(W) || put_in_inactive_hand(W))
-		W.update_held_icon()
+	if(put_in_active_hand(W))
+		update_inv_l_hand()
+		update_inv_r_hand()
 		return 1
-	return ..()
+	else if(put_in_inactive_hand(W))
+		update_inv_l_hand()
+		update_inv_r_hand()
+		return 1
+	else
+		return ..()
 
 /mob/living/carbon/human/put_in_l_hand(var/obj/item/W)
 	if(!..() || l_hand)
 		return 0
-	var/obj/item/organ/external/hand = organs_by_name["l_hand"]
-	if(!hand || !hand.is_usable())
-		return 0
-
 	W.forceMove(src)
 	l_hand = W
 	W.equipped(src,slot_l_hand)
@@ -1421,10 +1419,6 @@
 /mob/living/carbon/human/put_in_r_hand(var/obj/item/W)
 	if(!..() || r_hand)
 		return 0
-	var/obj/item/organ/external/hand = organs_by_name["r_hand"]
-	if(!hand || !hand.is_usable())
-		return 0
-
 	W.forceMove(src)
 	r_hand = W
 	W.equipped(src,slot_r_hand)

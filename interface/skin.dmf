@@ -1008,24 +1008,6 @@ menu "menu"
 		group = "size"
 		is-disabled = false
 		saved-params = "is-checked"
-	elem "icon128"
-		name = "&128x128"
-		command = ".winset \"mapwindow.map.icon-size=128\""
-		category = "&Icons"
-		is-checked = false
-		can-check = true
-		group = "size"
-		is-disabled = false
-		saved-params = "is-checked"
-	elem "icon96"
-		name = "&96x96"
-		command = ".winset \"mapwindow.map.icon-size=96\""
-		category = "&Icons"
-		is-checked = false
-		can-check = true
-		group = "size"
-		is-disabled = false
-		saved-params = "is-checked"
 	elem "icon64"
 		name = "&64x64"
 		command = ".winset \"mapwindow.map.icon-size=64\""
@@ -1712,7 +1694,7 @@ window "mainwindow"
 		right-click = false
 		saved-params = "pos;size;is-minimized;is-maximized"
 		on-size = ""
-		title = "Space Station 13"
+		title = ""
 		titlebar = true
 		statusbar = true
 		can-close = true

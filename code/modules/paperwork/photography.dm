@@ -28,7 +28,6 @@ var/global/photo_count = 0
 	icon = 'icons/obj/items.dmi'
 	icon_state = "photo"
 	item_state = "paper"
-	randpixel = 10
 	w_class = 1
 	var/id
 	var/icon/img	//Big photo image
@@ -101,11 +100,11 @@ var/global/photo_count = 0
 		if((!( M.restrained() ) && !( M.stat ) && M.back == src))
 			switch(over_object.name)
 				if("r_hand")
-					if(M.unEquip(src))
-						M.put_in_r_hand(src)
+					M.u_equip(src)
+					M.put_in_r_hand(src)
 				if("l_hand")
-					if(M.unEquip(src))
-						M.put_in_l_hand(src)
+					M.u_equip(src)
+					M.put_in_l_hand(src)
 			add_fingerprint(usr)
 			return
 		if(over_object == usr && in_range(src, usr) || usr.contents.Find(src))
@@ -251,6 +250,8 @@ var/global/photo_count = 0
 	p.tiny = pc
 	p.img = photoimage
 	p.desc = mobs
+	p.pixel_x = rand(-10, 10)
+	p.pixel_y = rand(-10, 10)
 	p.photo_size = size
 
 	return p

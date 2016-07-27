@@ -85,7 +85,7 @@
 				banreason = "[banreason] (CUSTOM CID)"
 		else
 			message_admins("Ban process: A mob matching [playermob.ckey] was found at location [playermob.x], [playermob.y], [playermob.z]. Custom ip and computer id fields replaced with the ip and computer id from the located mob")
-		notes_add(banckey,banreason,usr)
+		add_note(banckey, banreason, null, usr.ckey, 0)
 
 		DB_ban_record(bantype, playermob, banduration, banreason, banjob, null, banckey, banip, bancid )
 
@@ -691,7 +691,7 @@
 							msg = job
 						else
 							msg += ", [job]"
-					notes_add(M.ckey, "Banned  from [msg] - [reason]", usr)
+					add_note(M.ckey, "Banned  from [msg] - [reason]", null, usr.ckey, 0)
 					message_admins("\blue [key_name_admin(usr)] banned [key_name_admin(M)] from [msg] for [mins] minutes", 1)
 					M << "\red<BIG><B>You have been jobbanned by [usr.client.ckey] from: [msg].</B></BIG>"
 					M << "\red <B>The reason is: [reason]</B>"
@@ -712,7 +712,7 @@
 							jobban_fullban(M, job, "[reason]; By [usr.ckey] on [time2text(world.realtime)]")
 							if(!msg)	msg = job
 							else		msg += ", [job]"
-						notes_add(M.ckey, "Banned  from [msg] - [reason]", usr)
+						add_note(M.ckey, "Banned  from [msg] - [reason]", null, usr.ckey, 0)
 						message_admins("\blue [key_name_admin(usr)] banned [key_name_admin(M)] from [msg]", 1)
 						M << "\red<BIG><B>You have been jobbanned by [usr.client.ckey] from: [msg].</B></BIG>"
 						M << "\red <B>The reason is: [reason]</B>"
@@ -810,7 +810,7 @@
 					return
 				AddBan(M.ckey, M.computer_id, reason, usr.ckey, 1, mins)
 				ban_unban_log_save("[usr.client.ckey] has banned [M.ckey]. - Reason: [reason] - This will be removed in [mins] minutes.")
-				notes_add(M.ckey,"[usr.client.ckey] has banned [M.ckey]. - Reason: [reason] - This will be removed in [mins] minutes.",usr)
+				add_note(M.ckey,"[usr.client.ckey] has banned [M.ckey]. - Reason: [reason] - This will be removed in [mins] minutes.", null, usr.ckey, 0)
 				M << "\red<BIG><B>You have been banned by [usr.client.ckey].\nReason: [reason].</B></BIG>"
 				M << "\red This is a temporary ban, it will be removed in [mins] minutes."
 				feedback_inc("ban_tmp",1)
@@ -843,13 +843,91 @@
 				else
 					M << "\red No ban appeals URL has been set."
 				ban_unban_log_save("[usr.client.ckey] has permabanned [M.ckey]. - Reason: [reason] - This is a permanent ban.")
-				notes_add(M.ckey,"[usr.client.ckey] has permabanned [M.ckey]. - Reason: [reason] - This is a permanent ban.",usr)
+				add_note(M.ckey,"[usr.client.ckey] has permabanned [M.ckey]. - Reason: [reason] - This is a permanent ban.", null, usr.ckey, 0)
 				log_admin("[usr.client.ckey] has banned [M.ckey].\nReason: [reason]\nThis is a permanent ban.")
 				message_admins("\blue[usr.client.ckey] has banned [M.ckey].\nReason: [reason]\nThis is a permanent ban.")
 				feedback_inc("ban_perma",1)
 				DB_ban_record(BANTYPE_PERMA, M, -1, reason)
 
 				qdel(M.client)
+				//qdel(M)
+			if("Cancel")
+				return
+
+	else if(href_list["softban"])
+		if(!check_rights(R_MOD,0) && !check_rights(R_BAN, 0))
+			usr << "<span class='warning'>You do not have the appropriate permissions to add bans!</span>"
+			return
+
+		if(check_rights(R_MOD,0) && !check_rights(R_ADMIN, 0) && !config.mods_can_job_tempban) // If mod and tempban disabled
+			usr << "<span class='warning'>Mod jobbanning is disabled!</span>"
+			return
+
+		var/mob/M = locate(href_list["softban"])
+		if(!ismob(M)) return
+
+		if(M.client && M.client.holder)	return	//admins cannot be banned. Even if they could, the ban doesn't affect them anyway
+
+		switch(alert("Temporary Ban?",,"Yes","No", "Cancel"))
+			if("Yes")
+				var/mins = input(usr,"How long (in minutes)?","Ban time",1440) as num|null
+				if(!mins)
+					return
+				if(check_rights(R_MOD, 0) && !check_rights(R_BAN, 0) && mins > config.mod_tempban_max)
+					usr << "<span class='warning'>Moderators can only job tempban up to [config.mod_tempban_max] minutes!</span>"
+					return
+				if(mins >= 525600) mins = 525599
+				var/reason = sanitize(input(usr,"Reason?","reason","Griefer") as text|null)
+				if(!reason)
+					return
+				switch(alert(usr,"IP ban?",,"Yes","No","Cancel"))
+					if("Cancel")	return
+					if("Yes")
+						DB_ban_record(BANTYPE_SOFTBAN, M, mins, reason, bancid = M.computer_id, banip = M.lastKnownIP)
+					if("No")
+						DB_ban_record(BANTYPE_SOFTBAN, M, mins, reason, bancid = M.computer_id)
+				ban_unban_log_save("[usr.client.ckey] has soft banned [M.ckey]. - Reason: [reason] - This will be removed in [mins] minutes.")
+				add_note(M.ckey,"[usr.client.ckey] has soft banned [M.ckey]. - Reason: [reason] - This will be removed in [mins] minutes.", null, usr.ckey, 0)
+				M << "\red<BIG><B>You have been soft banned by [usr.client.ckey].\nReason: [reason].</B></BIG>"
+				M << "\red This is a soft temporary ban, it will be removed in [mins] minutes."
+				feedback_inc("ban_tmp",1)
+				feedback_inc("ban_tmp_mins",mins)
+				if(config.banappeals)
+					M << "\red To try to resolve this matter head to [config.banappeals]"
+				else
+					M << "\red No ban appeals URL has been set."
+				log_admin("[usr.client.ckey] has soft banned [M.ckey].\nReason: [reason]\nThis will be removed in [mins] minutes.")
+				message_admins("\blue[usr.client.ckey] has soft banned [M.ckey].\nReason: [reason]\nThis will be removed in [mins] minutes.")
+
+				qdel(M.client)
+				M.ckey = null
+				//qdel(M)	// See no reason why to delete mob. Important stuff can be lost. And ban can be lifted before round ends.
+			if("No")
+				if(!check_rights(R_BAN))   return
+				var/reason = sanitize(input(usr,"Reason?","reason","Griefer") as text|null)
+				if(!reason)
+					return
+				switch(alert(usr,"IP ban?",,"Yes","No","Cancel"))
+					if("Cancel")	return
+					if("Yes")
+						DB_ban_record(BANTYPE_SOFTPERMA, M, -1, reason, bancid = M.computer_id, banip = M.lastKnownIP)
+					if("No")
+						DB_ban_record(BANTYPE_SOFTPERMA, M, -1, reason, bancid = M.computer_id)
+				M << "\red<BIG><B>You have been soft banned by [usr.client.ckey].\nReason: [reason].</B></BIG>"
+				M << "\red This is a soft permanent ban."
+				if(config.banappeals)
+					M << "\red To try to resolve this matter head to [config.banappeals]"
+				else
+					M << "\red No ban appeals URL has been set."
+				ban_unban_log_save("[usr.client.ckey] has soft permabanned [M.ckey]. - Reason: [reason] - This is a soft permanent ban.")
+				add_note(M.ckey,"[usr.client.ckey] has soft permabanned [M.ckey]. - Reason: [reason] - This is a soft permanent ban.", null, usr.ckey, 0)
+				log_admin("[usr.client.ckey] has soft banned [M.ckey].\nReason: [reason]\nThis is a soft permanent ban.")
+				message_admins("\blue[usr.client.ckey] has soft banned [M.ckey].\nReason: [reason]\nThis is a soft permanent ban.")
+				feedback_inc("ban_perma",1)
+
+
+				qdel(M.client)
+				M.ckey = null
 				//qdel(M)
 			if("Cancel")
 				return
@@ -1394,21 +1472,86 @@
 			H.show(src.owner)
 		return
 
-	else if(href_list["FaxReply"])
-		var/mob/sender = locate(href_list["FaxReply"])
+	else if(href_list["CentcommFaxReply"])
+		var/mob/sender = locate(href_list["CentcommFaxReply"])
 		var/obj/machinery/photocopier/faxmachine/fax = locate(href_list["originfax"])
-		var/replyorigin = href_list["replyorigin"]
+
+		//todo: sanitize
+		var/input = input(src.owner, "Please enter a message to reply to [key_name(sender)] via secure connection. NOTE: BBCode does not work, but HTML tags do! Use <br> for line breaks.", "Outgoing message from Centcomm", "") as message|null
+		if(!input)	return
+
+		var/customname = input(src.owner, "Pick a title for the report", "Title") as text|null
+
+		// Create the reply message
+		var/obj/item/weapon/paper/P = new /obj/item/weapon/paper( null ) //hopefully the null loc won't cause trouble for us
+		P.name = "[command_name()]- [customname]"
+		P.info = input
+		P.update_icon()
+
+		// Stamps
+		var/image/stampoverlay = image('icons/obj/bureaucracy.dmi')
+		stampoverlay.icon_state = "paper_stamp-cent"
+		if(!P.stamped)
+			P.stamped = new
+		P.stamped += /obj/item/weapon/stamp
+		P.overlays += stampoverlay
+		P.stamps += "<HR><i>This paper has been stamped by the Central Command Quantum Relay.</i>"
+
+		if(fax.recievefax(P))
+			src.owner << "\blue Message reply to transmitted successfully."
+			log_admin("[key_name(src.owner)] replied to a fax message from [key_name(sender)]: [input]")
+			message_admins("[key_name_admin(src.owner)] replied to a fax message from [key_name_admin(sender)]", 1)
+		else
+			src.owner << "\red Message reply failed."
+
+		spawn(100)
+			qdel(P)
+		return
+
+	else if(href_list["SolGovFaxReply"])
+		//TODO
+		/*
+		var/mob/living/carbon/human/H = locate(href_list["SolGovFaxReply"])
+		var/obj/machinery/photocopier/faxmachine/fax = locate(href_list["originfax"])
+
+		var/input = input(src.owner, "Please enter a message to reply to [key_name(H)] via secure connection. NOTE: BBCode does not work, but HTML tags do! Use <br> for line breaks.", "Outgoing message from Centcomm", "") as message|null
+		if(!input)	return
+
+		var/customname = input(src.owner, "Pick a title for the report", "Title") as text|null
+
+		for(var/obj/machinery/photocopier/faxmachine/F in machines)
+			if(F == fax)
+				if(! (F.stat & (BROKEN|NOPOWER) ) )
+
+					// animate! it's alive!
+					flick("faxreceive", F)
+
+					// give the sprite some time to flick
+					spawn(20)
+						var/obj/item/weapon/paper/P = new /obj/item/weapon/paper( F.loc )
+						P.name = "Sol Government- [customname]"
+						P.info = input
+						P.update_icon()
+
+						playsound(F.loc, "sound/items/polaroid1.ogg", 50, 1)
+
+						// Stamps
+						var/image/stampoverlay = image('icons/obj/bureaucracy.dmi')
+						stampoverlay.icon_state = "paper_stamp-cap"
+						if(!P.stamped)
+							P.stamped = new
+						P.stamped += /obj/item/weapon/stamp
+						P.overlays += stampoverlay
+						P.stamps += "<HR><i>This paper has been stamped and encrypted by the Sol Government Quantum Relay.</i>"
+
+				src.owner << "Message reply to transmitted successfully."
+				log_admin("[key_name(src.owner)] replied to a fax message from [key_name(H)]: [input]")
+				message_admins("[key_name_admin(src.owner)] replied to a fax message from [key_name_admin(H)]", 1)
+				return
+		src.owner << "/red Unable to locate fax!"
+		*/
 
 
-		var/obj/item/weapon/paper/admin/P = new /obj/item/weapon/paper/admin( null ) //hopefully the null loc won't cause trouble for us
-		faxreply = P
-
-		P.admindatum = src
-		P.origin = replyorigin
-		P.destination = fax
-		P.sender = sender
-
-		P.adminbrowse()
 
 	else if(href_list["jumpto"])
 		if(!check_rights(R_ADMIN))	return
@@ -1818,36 +1961,49 @@
 
 			show_player_panel(M)
 
-	// player info stuff
+	//Player Notes
+	else if(href_list["addnote"])
+		var/target_ckey = href_list["addnote"]
+		add_note(target_ckey)
 
-	if(href_list["add_player_info"])
-		var/key = href_list["add_player_info"]
-		var/add = sanitize(input("Add Player Info") as null|text)
-		if(!add) return
+	else if(href_list["addnoteempty"])
+		add_note()
 
-		notes_add(key,add,usr)
-		show_player_info(key)
+	else if(href_list["removenote"])
+		var/note_id = href_list["removenote"]
+		remove_note(note_id)
 
-	if(href_list["remove_player_info"])
-		var/key = href_list["remove_player_info"]
-		var/index = text2num(href_list["remove_index"])
+	else if(href_list["editnote"])
+		var/note_id = href_list["editnote"]
+		edit_note(note_id)
 
-		notes_del(key, index)
-		show_player_info(key)
+	else if(href_list["shownote"])
+		var/target = href_list["shownote"]
+		show_note(index = target)
 
-	if(href_list["notes"])
-		var/ckey = href_list["ckey"]
-		if(!ckey)
-			var/mob/M = locate(href_list["mob"])
-			if(ismob(M))
-				ckey = M.ckey
+	else if(href_list["nonalpha"])
+		var/target = href_list["nonalpha"]
+		target = text2num(target)
+		show_note(index = target)
 
-		switch(href_list["notes"])
-			if("show")
-				show_player_info(ckey)
-			if("list")
-				PlayerNotesPage(text2num(href_list["index"]))
-		return
+	else if(href_list["shownoteckey"])
+		var/target_ckey = href_list["shownoteckey"]
+		show_note(target_ckey)
+
+	else if(href_list["notessearch"])
+		var/target = href_list["notessearch"]
+		show_note(index = target)
+
+	else if(href_list["noteedits"])
+		var/note_id = sanitizeSQL("[href_list["noteedits"]]")
+		var/DBQuery/query_noteedits = dbcon.NewQuery("SELECT edits FROM erro_notes WHERE id = '[note_id]'")
+		if(!query_noteedits.Execute())
+			var/err = query_noteedits.ErrorMsg()
+			log_game("SQL ERROR obtaining edits from notes table. Error : \[[err]\]\n")
+			return
+		if(query_noteedits.NextRow())
+			var/edit_log = query_noteedits.item[1]
+			usr << browse(edit_log,"window=noteedits")
 
 mob/living/proc/can_centcom_reply()
 	return 0

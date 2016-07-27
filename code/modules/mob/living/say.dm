@@ -87,30 +87,27 @@ proc/get_radio_key_from_channel(var/channel)
 /mob/living/proc/is_muzzled()
 	return 0
 
-//Takes a list of the form list(message, verb, whispering) and modifies it as needed
-//Returns 1 if a speech problem was applied, 0 otherwise
-/mob/living/proc/handle_speech_problems(var/list/message_data)
-	var/message = message_data[1]
-	var/verb = message_data[2]
-
-	. = 0
+/mob/living/proc/handle_speech_problems(var/message, var/verb)
+	var/list/returns[3]
+	var/speech_problem_flag = 0
 
 	if((HULK in mutations) && health >= 25 && length(message))
 		message = "[uppertext(message)]!!!"
 		verb = pick("yells","roars","hollers")
-		message_data[3] = 0
-		. = 1
+		speech_problem_flag = 1
 	if(slurring)
 		message = slur(message)
 		verb = pick("slobbers","slurs")
-		. = 1
+		speech_problem_flag = 1
 	if(stuttering)
 		message = stutter(message)
 		verb = pick("stammers","stutters")
-		. = 1
+		speech_problem_flag = 1
 
-	message_data[1] = message
-	message_data[2] = verb
+	returns[1] = message
+	returns[2] = verb
+	returns[3] = speech_problem_flag
+	return returns
 
 /mob/living/proc/handle_message_mode(message_mode, message, verb, speaking, used_radios, alt_name)
 	if(message_mode == "intercom")
@@ -127,12 +124,12 @@ proc/get_radio_key_from_channel(var/channel)
 
 /mob/living/proc/get_speech_ending(verb, var/ending)
 	if(ending=="!")
-		return pick("exclaims","shouts","yells")
+		return pick("восклицает","кричит","вопит")
 	if(ending=="?")
-		return "asks"
+		return "спрашивает"
 	return verb
 
-/mob/living/say(var/message, var/datum/language/speaking = null, var/verb="says", var/alt_name="")
+/mob/living/say(var/message, var/datum/language/speaking = null, var/verb="говорит", var/alt_name="")
 	if(client)
 		if(client.prefs.muted & MUTE_IC)
 			src << "\red You cannot speak in IC (Muted)."
@@ -144,6 +141,8 @@ proc/get_radio_key_from_channel(var/channel)
 		return
 
 	var/message_mode = parse_message_mode(message, "headset")
+
+	message = sanitize_a0(message)
 
 	switch(copytext(message,1,2))
 		if("*") return emote(copytext(message,2))
@@ -180,13 +179,12 @@ proc/get_radio_key_from_channel(var/channel)
 
 	message = trim_left(message)
 
-	message = handle_autohiss(message, speaking)
-
 	if(!(speaking && (speaking.flags & NO_STUTTER)))
-		var/list/message_data = list(message, verb, 0)
-		if(handle_speech_problems(message_data))
-			message = message_data[1]
-			verb = message_data[2]
+		message = handle_autohiss(message, speaking)
+
+		var/list/handle_s = handle_speech_problems(message, verb)
+		message = handle_s[1]
+		verb = handle_s[2]
 
 	if(!message || message == "")
 		return 0
@@ -217,8 +215,6 @@ proc/get_radio_key_from_channel(var/channel)
 			if (speech_sound)
 				sound_vol *= 0.5
 
-	var/list/listening = list()
-	var/list/listening_obj = list()
 	var/turf/T = get_turf(src)
 
 	//handle nonverbal and sign languages here
@@ -229,6 +225,9 @@ proc/get_radio_key_from_channel(var/channel)
 
 		if (speaking.flags & SIGNLANG)
 			return say_signlang(message, pick(speaking.signlang_verb), speaking)
+
+	var/list/listening = list()
+	var/list/listening_obj = list()
 
 	if(T)
 		//make sure the air can transmit speech - speaker's side
@@ -241,7 +240,9 @@ proc/get_radio_key_from_channel(var/channel)
 			italics = 1
 			sound_vol *= 0.5 //muffle the sound a bit, so it's like we're actually talking through contact
 
-		get_mobs_and_objs_in_view_fast(T, message_range, listening, listening_obj)
+		var/list/results = get_mobs_and_objs_in_view_fast(T, message_range)
+		listening = results["mobs"]
+		listening_obj = results["objs"]
 
 
 	var/speech_bubble_test = say_test(message)

@@ -63,11 +63,9 @@ var/global/list/default_medbay_channels = list(
 	..()
 	wires = new(src)
 	internal_channels = default_internal_channels.Copy()
-	listening_objects += src
 
 /obj/item/device/radio/Destroy()
 	qdel(wires)
-	listening_objects -= src
 	wires = null
 	if(radio_controller)
 		radio_controller.remove_object(src, frequency)
@@ -748,7 +746,6 @@ var/global/list/default_medbay_channels = list(
 	broadcasting = 0
 	icon = 'icons/obj/items.dmi'
 	icon_state = "red_phone"
-	randpixel = 0
 	listening = 1
 	name = "phone"
 

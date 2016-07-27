@@ -108,7 +108,7 @@
 
 /turf/simulated/floor/tiled/steel
 	name = "steel floor"
-	icon_state = "steel"
+	icon_state = "steel_dirty"
 	initial_flooring = /decl/flooring/tiling/steel
 
 /turf/simulated/floor/tiled/steel/airless

@@ -35,8 +35,6 @@
 	icon_state = "warden_jacket"
 	item_state = "armor"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|ARMS
-	cold_protection = UPPER_TORSO|LOWER_TORSO|ARMS
-	heat_protection = UPPER_TORSO|LOWER_TORSO|ARMS
 
 
 /obj/item/clothing/suit/armor/riot
@@ -44,88 +42,39 @@
 	desc = "A suit of armor with heavy padding to protect against melee attacks. Looks like it might impair movement."
 	icon_state = "riot"
 	item_state = "swat_suit"
-	w_class = 4
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 	armor = list(melee = 75, bullet = 33, laser = 50, energy = 10, bomb = 25, bio = 0, rad = 0)
+	flags_inv = HIDEJUMPSUIT
 	siemens_coefficient = 0.5
 
 /obj/item/clothing/suit/armor/riot/New()
 	..()
 	slowdown_per_slot[slot_wear_suit] = 1
 
-/obj/item/clothing/suit/armor/riot/vest
-	name = "stab vest"
-	desc = "An armored vest with heavy padding to protect against melee attacks."
-	icon_state = "riotvest"
+/obj/item/clothing/suit/armor/bulletproof
+	name = "ballistic vest"
+	desc = "A vest that excels in protecting the wearer against high-velocity solid projectiles."
+	icon_state = "bulletproof"
 	item_state = "armor"
 	blood_overlay_type = "armor"
-	w_class = 3
-	body_parts_covered = UPPER_TORSO|LOWER_TORSO
-
-/obj/item/clothing/suit/armor/riot/vest/New()
-	..()
-	slowdown_per_slot[slot_wear_suit] = 0
-
-/obj/item/clothing/suit/armor/bulletproof
-	name = "ballistic suit"
-	desc = "A suit of armor with heavy plates to protect against ballistic projectiles. Looks like it might impair movement."
-	icon_state = "bulletproof"
-	item_state = "swat_suit"
-	w_class = 4
-	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 	armor = list(melee = 42, bullet = 75, laser = 42, energy = 10, bomb = 25, bio = 0, rad = 0)
 	siemens_coefficient = 0.7
 
-/obj/item/clothing/suit/armor/bulletproof/New()
-	..()
-	slowdown_per_slot[slot_wear_suit] = 1
-
-/obj/item/clothing/suit/armor/bulletproof/vest
-	name = "ballistic vest"
-	desc = "A vest that excels in protecting the wearer against high-velocity solid projectiles."
-	icon_state = "bulletproofvest"
-	item_state = "armor"
-	blood_overlay_type = "armor"
-	w_class = 3
-	body_parts_covered = UPPER_TORSO|LOWER_TORSO
-
-/obj/item/clothing/suit/armor/bulletproof/vest/New()
-	..()
-	slowdown_per_slot[slot_wear_suit] = 0
-
 /obj/item/clothing/suit/armor/laserproof
-	name = "ablative suit"
-	desc = "A suit of armor with advanced shielding to protect against energy weapons. Looks like it might impair movement."
-	icon_state = "reflect"
-	item_state = "swat_suit"
-	w_class = 4
-	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
-	armor = list(melee = 33, bullet = 33, laser = 77, energy = 50, bomb = 0, bio = 0, rad = 0)
-	siemens_coefficient = 0
-
-/obj/item/clothing/suit/armor/laserproof/New()
-	..()
-	slowdown_per_slot[slot_wear_suit] = 1
-
-/obj/item/clothing/suit/armor/laserproof/vest
-	name = "ablative vest"
+	name = "ablative armor vest"
 	desc = "A vest that excels in protecting the wearer against energy projectiles."
-	icon_state = "reflectvest"
+	icon_state = "armor_reflec"
 	item_state = "armor_reflec"
 	blood_overlay_type = "armor"
-	w_class = 3
-	body_parts_covered = UPPER_TORSO|LOWER_TORSO
-
-/obj/item/clothing/suit/armor/laserproof/vest/New()
-	..()
-	slowdown_per_slot[slot_wear_suit] = 0
+	armor = list(melee = 33, bullet = 33, laser = 77, energy = 50, bomb = 0, bio = 0, rad = 0)
+	siemens_coefficient = 0
 
 /obj/item/clothing/suit/armor/laserproof/handle_shield(mob/user, var/damage, atom/damage_source = null, mob/attacker = null, var/def_zone = null, var/attack_text = "the attack")
 	if(istype(damage_source, /obj/item/projectile/energy) || istype(damage_source, /obj/item/projectile/beam))
 		var/obj/item/projectile/P = damage_source
 
 		var/reflectchance = 40 - round(damage/3)
-		if(!(def_zone in list("chest", "groin"))) //not changing this so arm and leg shots reflect, gives some incentive to not aim center-mass
+		if(!(def_zone in list("chest", "groin")))
 			reflectchance /= 2
 		if(P.starting && prob(reflectchance))
 			visible_message("<span class='danger'>\The [user]'s [src.name] reflects [attack_text]!</span>")
@@ -146,9 +95,8 @@
 	icon_state = "detective"
 	item_state = "det_suit"
 	blood_overlay_type = "coat"
-	body_parts_covered = UPPER_TORSO|LOWER_TORSO|ARMS
-	cold_protection = UPPER_TORSO|LOWER_TORSO|ARMS
-	heat_protection = UPPER_TORSO|LOWER_TORSO|ARMS
+	flags_inv = 0
+	body_parts_covered = UPPER_TORSO|ARMS
 
 
 /obj/item/clothing/suit/armor/det_suit
@@ -224,7 +172,6 @@
 	icon_state = "swatarmor"
 	item_state = "armor"
 	var/obj/item/weapon/gun/holstered = null
-	w_class = 4
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|ARMS
 	armor = list(melee = 60, bullet = 60, laser = 60, energy = 40, bomb = 20, bio = 0, rad = 0)
 	siemens_coefficient = 0.7
@@ -256,126 +203,98 @@
 		holster.unholster(usr)
 
 //Non-hardsuit ERT armor.
-//Commander
 /obj/item/clothing/suit/armor/vest/ert
-	name = "asset protection command armor"
-	desc = "A set of armor worn by many corporate and private asset protection forces. Has blue highlights."
+	name = "emergency response team armor"
+	desc = "A set of armor worn by members of the Emergency Response Team."
 	icon_state = "ertarmor_cmd"
 	item_state = "armor"
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|ARMS
 	armor = list(melee = 60, bullet = 60, laser = 60, energy = 40, bomb = 20, bio = 0, rad = 0)
 
+//Commander
+/obj/item/clothing/suit/armor/vest/ert/command
+	name = "emergency response team commander armor"
+	desc = "A set of armor worn by the commander of an Emergency Response Team. Has blue highlights."
+
 //Security
 /obj/item/clothing/suit/armor/vest/ert/security
-	name = "asset protection security armor"
-	desc = "A set of armor worn by many corporate and private asset protection forces. Has red highlights."
+	name = "emergency response team security armor"
+	desc = "A set of armor worn by security members of the Emergency Response Team. Has red highlights."
 	icon_state = "ertarmor_sec"
 
 //Engineer
 /obj/item/clothing/suit/armor/vest/ert/engineer
-	name = "asset protection engineering armor"
-	desc = "A set of armor worn by many corporate and private asset protection forces. Has orange highlights."
+	name = "emergency response team engineer armor"
+	desc = "A set of armor worn by engineering members of the Emergency Response Team. Has orange highlights."
 	icon_state = "ertarmor_eng"
 
 //Medical
 /obj/item/clothing/suit/armor/vest/ert/medical
-	name = "asset protection medical armor"
-	desc = "A set of armor worn by many corporate and private asset protection forces. Has red and white highlights."
+	name = "emergency response team medical armor"
+	desc = "A set of armor worn by medical members of the Emergency Response Team. Has red and white highlights."
 	icon_state = "ertarmor_med"
 
 //New Vests
 /obj/item/clothing/suit/armor/vest
-	name = "armored vest"
+	name = "armor vest"
 	desc = "An armor vest made of synthetic fibers."
 	icon_state = "kvest"
 	item_state = "armor"
-	armor = list(melee = 30, bullet = 15, laser = 40, energy = 10, bomb = 25, bio = 0, rad = 0)
+	armor = list(melee = 50, bullet = 15, laser = 50, energy = 10, bomb = 25, bio = 0, rad = 0)
 
-/obj/item/clothing/suit/armor/vest/nt
-	name = "\improper NanoTrasen armored vest"
+/obj/item/clothing/suit/armor/vest/security
+	name = "security vest"
 	desc = "A synthetic armor vest. This one is marked with the crest of NanoTrasen."
-	icon_state = "ntvest"
-
-/obj/item/clothing/suit/armor/vest/solgov
-	name = "\improper Sol Central Government armored vest"
-	desc = "A synthetic armor vest. This one is marked with the crest of the Sol Central Government."
-	icon_state = "solvest"
+	icon_state = "secvest"
 
 /obj/item/clothing/suit/armor/vest/detective
-	name = "brown armored vest"
+	name = "detective armor vest"
 	desc = "An synthetic armor vest colored in a vintage brown."
 	icon_state = "detvest"
-
-/obj/item/clothing/suit/armor/vest/pcrc
-	name = "contractor armored vest"
-	desc = "A synthetic armor vest. This one is marked with the crest of Proxima Centauri Risk Control, a private security firm."
-	icon_state = "pcrcvest"
 
 /obj/item/clothing/suit/storage/vest
 	name = "webbed armor vest"
 	desc = "A synthetic armor vest. This one has added webbing and ballistic plates."
 	icon_state = "webvest"
-	armor = list(melee = 40, bullet = 40, laser = 40, energy = 25, bomb = 30, bio = 0, rad = 0)
+	armor = list(melee = 50, bullet = 40, laser = 50, energy = 25, bomb = 30, bio = 0, rad = 0)
 	allowed = list(/obj/item/weapon/gun/energy,/obj/item/device/radio,/obj/item/weapon/reagent_containers/spray/pepper,/obj/item/weapon/gun/projectile,/obj/item/ammo_magazine,/obj/item/ammo_casing,/obj/item/weapon/melee/baton,/obj/item/weapon/handcuffs)
+
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO
 	item_flags = THICKMATERIAL
+
 	cold_protection = UPPER_TORSO|LOWER_TORSO
 	min_cold_protection_temperature = ARMOR_MIN_COLD_PROTECTION_TEMPERATURE
 	heat_protection = UPPER_TORSO|LOWER_TORSO
 	max_heat_protection_temperature = ARMOR_MAX_HEAT_PROTECTION_TEMPERATURE
 	siemens_coefficient = 0.6
 
-/obj/item/clothing/suit/storage/vest/nt
-	name = "corporate security heavy armored vest"
-	desc = "A synthetic armor vest with CORPORATE SECURITY printed in red lettering on the chest. This one has added webbing and ballistic plates."
-	icon_state = "ntwebvest"
+/obj/item/clothing/suit/storage/vest/officer
+	name = "security armor vest"
+	desc = "A synthetic armor vest with SECURITY printed in red lettering on the chest. This one has added webbing and ballistic plates."
+	icon_state = "officervest"
 
-/obj/item/clothing/suit/storage/vest/nt/warden
-	name = "warden heavy armored vest"
+/obj/item/clothing/suit/storage/vest/warden
+	name = "warden armor vest"
 	desc = "A synthetic armor vest with WARDEN printed in silver lettering on the chest. This one has added webbing and ballistic plates."
-	icon_state = "secwebvest"
+	icon_state = "wardenvest"
 
-/obj/item/clothing/suit/storage/vest/nt/hos
-	name = "commander heavy armored vest"
+/obj/item/clothing/suit/storage/vest/hos
+	name = "commander armor vest"
 	desc = "A synthetic armor vest with COMMANDER printed in gold lettering on the chest. This one has added webbing and ballistic plates."
-	icon_state = "comwebvest"
-
-/obj/item/clothing/suit/storage/vest/solgov
-	name = "\improper Sol Central Government heavy armored vest"
-	desc = "A synthetic armor vest with PEACEKEEPER printed in distinctive blue lettering on the chest. This one has added webbing and ballistic plates."
-	icon_state = "solwebvest"
-
-/obj/item/clothing/suit/storage/vest/solgov/security
-	name = "master at arms heavy armored vest"
-	desc = "A synthetic armor vest with MASTER AT ARMS printed in silver lettering on the chest. This one has added webbing and ballistic plates."
-	icon_state = "secwebvest"
-
-/obj/item/clothing/suit/storage/vest/solgov/command
-	name = "command heavy armored vest"
-	desc = "A synthetic armor vest with SOL CENTRAL GOVERNMENT printed in gold lettering on the chest. This one has added webbing and ballistic plates."
-	icon_state = "comwebvest"
+	icon_state = "hosvest"
 
 /obj/item/clothing/suit/storage/vest/pcrc
-	name = "contractor heavy armored vest"
-	desc = "A synthetic armor vest with PRIVATE SECURITY printed in cyan lettering on the chest. This one has added webbing and ballistic plates."
-	icon_state = "pcrcwebvest"
+	name = "\improper PCRC armor vest"
+	desc = "A synthetic armor vest with SECURITY printed in cyan lettering on the chest. This one has added webbing and ballistic plates."
+	icon_state = "pcrcvest"
 
-/obj/item/clothing/suit/storage/vest/tactical //crack at a more balanced mid-range armor, minor improvements over standard vests, with the idea "modern" combat armor would focus on energy weapon protection.
-	name = "tactical armored vest"
-	desc = "A heavy armored vest in a fetching tan. It is surprisingly flexible and light, even with the extra webbing and advanced ceramic plates."
-	icon_state = "tacwebvest"
-	item_state = "tacwebvest"
-	armor = list(melee = 50, bullet = 40, laser = 60, energy = 35, bomb = 30, bio = 0, rad = 0)
-
+//Provides the protection of a merc voidsuit, but only covers the chest/groin, and also takes up a suit slot. In exchange it has no slowdown and provides storage.
 /obj/item/clothing/suit/storage/vest/merc
-	name = "heavy combat armor"
-	desc = "A high-quality armored vest made from a hard synthetic material. It is surprisingly flexible and light, despite formidable armor plating."
+	name = "heavy armor vest"
+	desc = "A high-quality armor vest in a fetching tan. It is surprisingly flexible and light, even with the added webbing and armor plating."
 	icon_state = "mercwebvest"
 	item_state = "mercwebvest"
 	armor = list(melee = 60, bullet = 60, laser = 60, energy = 40, bomb = 40, bio = 0, rad = 0)
-	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS //now covers legs with new sprite
-	cold_protection = UPPER_TORSO|LOWER_TORSO|LEGS
-	heat_protection = UPPER_TORSO|LOWER_TORSO|LEGS
 
 
 //All of the armor below is mostly unused

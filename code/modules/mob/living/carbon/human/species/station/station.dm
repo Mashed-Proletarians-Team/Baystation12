@@ -36,7 +36,6 @@
 	num_alternate_languages = 2
 	secondary_langs = list(LANGUAGE_UNATHI)
 	name_language = LANGUAGE_UNATHI
-	health_hud_intensity = 2
 
 	min_age = 18
 	max_age = 60
@@ -55,7 +54,7 @@
 	heat_level_2 = 480 //Default 400
 	heat_level_3 = 1100 //Default 1000
 
-	spawn_flags = CAN_JOIN | IS_WHITELISTED
+	spawn_flags = CAN_JOIN
 	appearance_flags = HAS_HAIR_COLOR | HAS_LIPS | HAS_UNDERWEAR | HAS_SKIN_COLOR | HAS_EYE_COLOR
 
 	flesh_color = "#34AF10"
@@ -97,7 +96,6 @@
 	num_alternate_languages = 2
 	secondary_langs = list(LANGUAGE_SIIK_MAAS)
 	name_language = LANGUAGE_SIIK_MAAS
-	health_hud_intensity = 1.75
 
 	min_age = 17
 	max_age = 80
@@ -118,7 +116,7 @@
 
 	primitive_form = "Farwa"
 
-	spawn_flags = CAN_JOIN | IS_WHITELISTED
+	spawn_flags = CAN_JOIN
 	appearance_flags = HAS_HAIR_COLOR | HAS_LIPS | HAS_UNDERWEAR | HAS_SKIN_COLOR | HAS_EYE_COLOR
 
 	flesh_color = "#AFA59E"
@@ -154,7 +152,6 @@
 	num_alternate_languages = 2
 	secondary_langs = list(LANGUAGE_SKRELLIAN)
 	name_language = null
-	health_hud_intensity = 1.75
 
 	min_age = 19
 	max_age = 90
@@ -184,8 +181,6 @@
 	show_ssd = "completely quiescent"
 	num_alternate_languages = 1
 	name_language = LANGUAGE_ROOTSPEAK
-	spawns_with_stack = 0
-	health_hud_intensity = 1.5
 
 	min_age = 1
 	max_age = 300

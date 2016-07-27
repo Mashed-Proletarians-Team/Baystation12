@@ -138,10 +138,10 @@
 		return
 
 	for (var/obj/item/organ/external/E in organs)
-		if(!E || !E.can_grasp)
+		if(!E || !E.can_grasp || (E.status & ORGAN_SPLINTED))
 			continue
 
-		if((E.is_broken() || E.is_dislocated()) && !E.splinted)
+		if(E.is_broken() || E.is_dislocated())
 			switch(E.body_part)
 				if(HAND_LEFT, ARM_LEFT)
 					if(!l_hand)

@@ -10,6 +10,7 @@
 	//l_color="#0066FF"
 	layer = LIGHTING_LAYER+1
 
+	var/spawned=0 // DIR mask
 	var/next_check=0
 	var/list/avail_dirs = list(NORTH,SOUTH,EAST,WEST)
 
@@ -28,7 +29,7 @@
 
 	// No more available directions? Shut down process().
 	if(avail_dirs.len==0)
-		processing_turfs.Remove(src)
+		processing_objects.Remove(src)
 		return 1
 
 	// We're checking, reset the timer.
@@ -46,8 +47,18 @@
 		spawn(10)
 			// Nom.
 			for(var/atom/movable/A in T)
-				Consume(A)
+				if(A)
+					if(istype(A,/mob/living))
+						qdel(A)
+					else if(istype(A,/mob)) // Observers, AI cameras.
+						continue
+					else
+						qdel(A)
 			T.ChangeTurf(type)
+
+	if((spawned & (NORTH|SOUTH|EAST|WEST)) == (NORTH|SOUTH|EAST|WEST))
+		processing_turfs -= src
+		return
 
 /turf/unsimulated/wall/supermatter/attack_generic(mob/user as mob)
 	if(istype(user))
@@ -86,6 +97,7 @@
 	user.drop_from_inventory(W)
 	Consume(W)
 
+
 /turf/unsimulated/wall/supermatter/Bumped(atom/AM as mob|obj)
 	if(istype(AM, /mob/living))
 		AM.visible_message("<span class=\"warning\">\The [AM] slams into \the [src] inducing a resonance... \his body starts to glow and catch flame before flashing into ash.</span>",\
@@ -99,9 +111,9 @@
 
 	Consume(AM)
 
-/turf/unsimulated/wall/supermatter/proc/Consume(var/atom/A)
-	if(isobserver(A))
+
+/turf/unsimulated/wall/supermatter/proc/Consume(var/mob/living/user)
+	if(isobserver(user))
 		return
-	if(!A.simulated)
-		return
-	qdel(A)
+
+	qdel(user)

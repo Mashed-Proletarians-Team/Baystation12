@@ -194,7 +194,9 @@
 	..()
 
 /mob/living/simple_animal/spiderbot/death()
-	switch_from_living_to_dead_mob_list()
+
+	living_mob_list -= src
+	dead_mob_list += src
 
 	if(camera)
 		camera.status = 0
@@ -277,5 +279,9 @@
 	..(user)
 	if(src.held_item)
 		user << "It is carrying \icon[src.held_item] \a [src.held_item]."
+
+/mob/living/simple_animal/spiderbot/cannot_use_vents()
+	return
+
 /mob/living/simple_animal/spiderbot/binarycheck()
 	return positronic

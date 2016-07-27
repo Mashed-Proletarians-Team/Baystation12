@@ -11,6 +11,8 @@
 
 	var/stat = 0 //Whether a mob is alive or dead. TODO: Move this to living - Nodrak
 
+	var/obj/screen/flash = null
+	var/obj/screen/blind = null
 	var/obj/screen/hands = null
 	var/obj/screen/pullin = null
 	var/obj/screen/purged = null
@@ -25,6 +27,7 @@
 	var/obj/screen/throw_icon = null
 	var/obj/screen/nutrition_icon = null
 	var/obj/screen/pressure = null
+	var/obj/screen/damageoverlay = null
 	var/obj/screen/pain = null
 	var/obj/screen/gun/item/item_use_icon = null
 	var/obj/screen/gun/radio/radio_use_icon = null
@@ -74,7 +77,7 @@
 	var/list/pinned = list()            // List of things pinning this creature to walls (see living_defense.dm)
 	var/list/embedded = list()          // Embedded items, since simple mobs don't have organs.
 	var/list/languages = list()         // For speaking/listening.
-	var/list/speak_emote = list("says") // Verbs used when speaking. Defaults to 'say' if speak_emote is null.
+	var/list/speak_emote = list("говорит") // Verbs used when speaking. Defaults to 'say' if speak_emote is null.
 	var/emote_type = 1		// Define emote default type, 1 for seen emotes, 2 for heard emotes
 	var/facing_dir = null   // Used for the ancient art of moonwalking.
 
@@ -83,8 +86,8 @@
 	var/timeofdeath = 0.0
 
 	var/bodytemperature = 310.055	//98.7 F
-	var/default_pixel_x = 0
-	var/default_pixel_y = 0
+	var/old_x = 0
+	var/old_y = 0
 
 	var/shakecamera = 0
 	var/a_intent = I_HELP//Living
@@ -120,6 +123,7 @@
 	var/voice_name = "unidentifiable voice"
 
 	var/faction = "neutral" //Used for checking whether hostile simple animals will attack you, possibly more stuff later
+	var/captured = 0 //Functionally, should give the same effect as being buckled into a chair when true. Only used by energy nets, TODO replace with buckling
 	var/blinded = null
 	var/ear_deaf = null		//Carbon
 

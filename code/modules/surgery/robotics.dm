@@ -167,16 +167,14 @@
 			var/obj/item/stack/cable_coil/C = tool
 			var/obj/item/organ/external/affected = target.get_organ(target_zone)
 			var/limb_can_operate = (affected && affected.open == 2 && affected.burn_dam > 0 && target_zone != "mouth")
-
-			if(!limb_can_operate)
-				return 0
-
-			if(istype(C))
-				if(!C.can_use(10))
-					user << "<span class='danger'>You need ten or more cable pieces to repair this damage.</span>" //usage amount made more consistent with regular cable repair
-					return SURGERY_FAILURE
-				C.use(10)
-			return 1
+			if(limb_can_operate)
+				if(istype(C))
+					if(!C.get_amount() >= 3)
+						user << "<span class='danger'>You need three or more cable pieces to repair this damage.</span>"
+						return SURGERY_FAILURE
+					C.use(3)
+				return 1
+			return 0
 
 	begin_step(mob/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
 		var/obj/item/organ/external/affected = target.get_organ(target_zone)
@@ -372,7 +370,7 @@
 
 	can_use(mob/living/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
 
-		if(target_zone != "chest")
+		if(target_zone != "head")
 			return
 
 		var/obj/item/device/mmi/M = tool
@@ -388,7 +386,7 @@
 			return SURGERY_FAILURE
 
 		if(!(affected.robotic >= ORGAN_ROBOT))
-			user << "<span class='danger'>You cannot install a computer brain into a meat torso.</span>"
+			user << "<span class='danger'>You cannot install a computer brain into a meat skull.</span>"
 			return SURGERY_FAILURE
 
 		if(!target.species)
@@ -420,7 +418,7 @@
 		var/obj/item/organ/mmi_holder/holder = new(target, 1)
 		target.internal_organs_by_name["brain"] = holder
 		user.drop_from_inventory(tool)
-		tool.forceMove(holder)
+		tool.loc = holder
 		holder.stored_mmi = tool
 		holder.update_from_mmi()
 

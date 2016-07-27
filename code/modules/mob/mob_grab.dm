@@ -79,7 +79,7 @@
 
 
 //This makes sure that the grab screen object is displayed in the correct hand.
-/obj/item/weapon/grab/proc/synch() //why is this needed?
+/obj/item/weapon/grab/proc/synch()
 	if(affecting)
 		if(assailant.r_hand == src)
 			hud.screen_loc = ui_rhand
@@ -176,17 +176,13 @@
 	return s_click(hud)
 
 
-/obj/item/weapon/grab/proc/reset_position()
-	if(!affecting.buckled)
-		animate(affecting, pixel_x = 0, pixel_y = 0, 4, 1, LINEAR_EASING)
-	affecting.layer = initial(affecting.layer)
-
 //Updating pixelshift, position and direction
 //Gets called on process, when the grab gets upgraded or the assailant moves
 /obj/item/weapon/grab/proc/adjust_position()
-	if(!affecting || affecting.buckled)
+	if(!affecting)
 		return
-	if(!assailant)
+	if(affecting.buckled)
+		animate(affecting, pixel_x = 0, pixel_y = 0, 4, 1, LINEAR_EASING)
 		return
 	if(affecting.lying && state != GRAB_KILL)
 		animate(affecting, pixel_x = 0, pixel_y = 0, 5, 1, LINEAR_EASING)
@@ -195,7 +191,7 @@
 		return
 	var/shift = 0
 	var/adir = get_dir(assailant, affecting)
-	affecting.layer = initial(affecting.layer)
+	affecting.layer = 4
 	switch(state)
 		if(GRAB_PASSIVE)
 			shift = 8
@@ -218,7 +214,7 @@
 	switch(adir)
 		if(NORTH)
 			animate(affecting, pixel_x = 0, pixel_y =-shift, 5, 1, LINEAR_EASING)
-			affecting.layer = initial(affecting.layer) - 0.1
+			affecting.layer = 3.9
 		if(SOUTH)
 			animate(affecting, pixel_x = 0, pixel_y = shift, 5, 1, LINEAR_EASING)
 		if(WEST)
@@ -310,7 +306,6 @@
 	//clicking on the victim while grabbing them
 	if(M == affecting)
 		if(ishuman(affecting))
-			var/mob/living/carbon/human/H = affecting
 			var/hit_zone = assailant.zone_sel.selecting
 			flick(hud.icon_state, hud)
 			switch(assailant.a_intent)
@@ -319,10 +314,7 @@
 						assailant << "<span class='warning'>You are no longer pinning [affecting] to the ground.</span>"
 						force_down = 0
 						return
-					if(state >= GRAB_AGGRESSIVE)
-						H.apply_pressure(assailant, hit_zone)
-					else
-						inspect_organ(affecting, assailant, hit_zone)
+					inspect_organ(affecting, assailant, hit_zone)
 
 				if(I_GRAB)
 					jointlock(affecting, assailant, hit_zone)
@@ -356,18 +348,14 @@
 		state = GRAB_NECK
 
 /obj/item/weapon/grab/proc/handle_resist()
-	var/grab_name = "grip"
+	var/grab_name
 	var/break_strength = 1
 	var/list/break_chance_table = list(100)
 	switch(state)
-		if(GRAB_PASSIVE)
-			//Being knocked down makes it harder to break a grab, so it is easier to cuff someone who is down without forcing them into unconsciousness.
-			//use same chance_table as aggressive but give +2 for not-weakened so that resomi grabs don't become auto-success for weakened either, that's lame
-			if(!affecting.incapacitated(INCAPACITATION_KNOCKDOWN))
-				break_strength += 2
-			break_chance_table = list(15, 60, 100)
+		//if(GRAB_PASSIVE)
 
 		if(GRAB_AGGRESSIVE)
+			grab_name = "grip"
 			//Being knocked down makes it harder to break a grab, so it is easier to cuff someone who is down without forcing them into unconsciousness.
 			if(!affecting.incapacitated(INCAPACITATION_KNOCKDOWN))
 				break_strength++
@@ -391,16 +379,16 @@
 
 //returns the number of size categories between affecting and assailant, rounded. Positive means A is larger than B
 /obj/item/weapon/grab/proc/size_difference(mob/A, mob/B)
-	return mob_size_difference(A.mob_size, B.mob_size)
+	return round(log(2, A.mob_size/B.mob_size), 1)
 
 /obj/item/weapon/grab
 	var/destroying = 0
 
 /obj/item/weapon/grab/Destroy()
+	animate(affecting, pixel_x = 0, pixel_y = 0, 4, 1, LINEAR_EASING)
+	affecting.layer = 4
 	if(affecting)
-		reset_position()
 		affecting.grabbed_by -= src
-		affecting.layer = initial(affecting.layer)
 		affecting = null
 	if(assailant)
 		if(assailant.client)

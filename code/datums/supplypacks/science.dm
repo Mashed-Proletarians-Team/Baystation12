@@ -1,5 +1,6 @@
 /decl/hierarchy/supply_pack/science
 	name = "Science"
+	hierarchy_type = /decl/hierarchy/supply_pack/science
 
 /decl/hierarchy/supply_pack/science/virus
 	name = "Virus sample crate"

@@ -30,10 +30,6 @@
 	icon = 'icons/mob/alien.dmi'
 	icon_state = "chitin"
 
-/obj/item/organ/brain/robotize()
-	. = ..()
-	icon_state = "brain-prosthetic"
-
 /obj/item/organ/brain/New()
 	..()
 	health = config.default_brain_health
@@ -84,8 +80,6 @@
 
 /obj/item/organ/brain/replaced(var/mob/living/target)
 
-	if(!..()) return 0
-
 	if(target.key)
 		target.ghostize()
 
@@ -94,8 +88,7 @@
 			brainmob.mind.transfer_to(target)
 		else
 			target.key = brainmob.key
-
-	return 1
+	..()
 
 /obj/item/organ/brain/slime
 	name = "slime core"

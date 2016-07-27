@@ -31,13 +31,6 @@
 	BITSET(hud_updateflag, STATUS_HUD)
 	BITSET(hud_updateflag, LIFE_HUD)
 
-
-	//backs up lace if available.
-	var/obj/item/organ/stack/s = get_organ("stack")
-	if(s)
-		s.do_backup()
-
-
 	//Handle species-specific deaths.
 	species.handle_death(src)
 
@@ -88,8 +81,7 @@
 	update_hair(0)
 
 	mutations.Add(HUSK)
-	for(var/obj/item/organ/external/E in organs)
-		E.disfigured = 1
+	status_flags |= DISFIGURED	//makes them unknown without fucking up other stuff like admintools
 	update_body(1)
 	return
 
@@ -108,7 +100,6 @@
 	update_hair(0)
 
 	mutations.Add(SKELETON)
-	for(var/obj/item/organ/external/E in organs)
-		E.disfigured = 1
+	status_flags |= DISFIGURED
 	update_body(1)
 	return

@@ -222,19 +222,10 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 	zippomes = "<span class='rose'>With a flick of their wrist, USER lights their NAME with their FLAME.</span>"
 	weldermes = "<span class='notice'>USER casually lights the NAME with FLAME.</span>"
 	ignitermes = "<span class='notice'>USER fiddles with FLAME, and manages to light their NAME.</span>"
-
-/obj/item/clothing/mask/smokable/cigarette/New()
-	..()
-	reagents.add_reagent("nicotine", 1)
-
-/obj/item/clothing/mask/smokable/cigarette/menthol
-	name = "menthol cigarette"
-	desc = "A cigarette with a little minty kick. Well, minty in theory."
-
-/obj/item/clothing/mask/smokable/cigarette/menthol/New()
-	..()
-	reagents.add_reagent("nicotine", 1)
-	reagents.add_reagent("menthol", 1)
+	
+	New()
+		..()
+		reagents.add_reagent("nicotine", 1)
 
 /obj/item/clothing/mask/smokable/cigarette/attackby(obj/item/weapon/W as obj, mob/user as mob)
 	..()
@@ -285,7 +276,7 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 	zippomes = "<span class='rose'>With a flick of their wrist, USER lights their NAME with their FLAME.</span>"
 	weldermes = "<span class='notice'>USER insults NAME by lighting it with FLAME.</span>"
 	ignitermes = "<span class='notice'>USER fiddles with FLAME, and manages to light their NAME with the power of science.</span>"
-
+	
 	New()
 		..()
 		reagents.add_reagent("nicotine", 5)
@@ -305,7 +296,7 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 	icon_off = "cigar2off"
 	smoketime = 3000
 	chem_volume = 20
-
+	
 	New()
 		..()
 		reagents.add_reagent("nicotine", 10)
@@ -315,13 +306,14 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 	desc = "A manky old cigarette butt."
 	icon = 'icons/obj/clothing/masks.dmi'
 	icon_state = "cigbutt"
-	randpixel = 10
 	w_class = 1
 	slot_flags = SLOT_EARS
 	throwforce = 1
 
 /obj/item/weapon/cigbutt/New()
 	..()
+	pixel_x = rand(-10,10)
+	pixel_y = rand(-10,10)
 	transform = turn(transform,rand(0,360))
 
 /obj/item/weapon/cigbutt/cigarbutt
@@ -505,22 +497,19 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 /obj/item/weapon/flame/lighter/attack(mob/living/carbon/M as mob, mob/living/carbon/user as mob)
 	if(!istype(M, /mob))
 		return
+	M.IgniteMob()
 
-	if(lit)
-		M.IgniteMob()
-
-		if(istype(M.wear_mask, /obj/item/clothing/mask/smokable/cigarette) && user.zone_sel.selecting == "mouth")
-			var/obj/item/clothing/mask/smokable/cigarette/cig = M.wear_mask
-			if(M == user)
-				cig.attackby(src, user)
+	if(istype(M.wear_mask, /obj/item/clothing/mask/smokable/cigarette) && user.zone_sel.selecting == "mouth" && lit)
+		var/obj/item/clothing/mask/smokable/cigarette/cig = M.wear_mask
+		if(M == user)
+			cig.attackby(src, user)
+		else
+			if(istype(src, /obj/item/weapon/flame/lighter/zippo))
+				cig.light("<span class='rose'>[user] whips the [name] out and holds it for [M].</span>")
 			else
-				if(istype(src, /obj/item/weapon/flame/lighter/zippo))
-					cig.light("<span class='rose'>[user] whips the [name] out and holds it for [M].</span>")
-				else
-					cig.light("<span class='notice'>[user] holds the [name] out for [M], and lights the [cig.name].</span>")
-			return
-
-	..()
+				cig.light("<span class='notice'>[user] holds the [name] out for [M], and lights the [cig.name].</span>")
+	else
+		..()
 
 /obj/item/weapon/flame/lighter/process()
 	var/turf/location = get_turf(src)

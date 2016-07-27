@@ -1,5 +1,6 @@
 /decl/hierarchy/supply_pack/miscellaneous
 	name = "Miscellaneous"
+	hierarchy_type = /decl/hierarchy/supply_pack/miscellaneous
 
 /decl/hierarchy/supply_pack/miscellaneous/wizard
 	name = "Wizard costume"
@@ -215,7 +216,6 @@
 		/obj/item/device/kit/paint/durand/seraph,
 		/obj/item/device/kit/paint/durand/phazon
 		)
-	cost = 200
 	containername = "heavy crate"
 	supply_method = /decl/supply_method/randomized
 
@@ -227,7 +227,6 @@
 		/obj/item/device/kit/paint/gygax/darkgygax,
 		/obj/item/device/kit/paint/gygax/recitence
 		)
-	cost = 200
 	containername = "heavy crate"
 	supply_method = /decl/supply_method/randomized
 

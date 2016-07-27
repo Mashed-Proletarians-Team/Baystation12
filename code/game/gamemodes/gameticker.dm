@@ -44,9 +44,11 @@ var/global/datum/controller/gameticker/ticker
 	'sound/music/halloween/ghosts.ogg'*/
 	'sound/music/space.ogg',\
 	'sound/music/traitor.ogg',\
+	'sound/music/space_asshole.ogg',\
+	'sound/music/THUNDERDOME.ogg',\
 	'sound/music/title2.ogg',\
-	'sound/music/clouds.s3m',\
-	'sound/music/space_oddity.ogg') //Ground Control to Major Tom, this song is cool, what's going on?
+	'sound/music/royksopp.ogg',\
+	'sound/music/space_oddity.ogg')//Ground Control to Major Tom, this song is cool, what's going on?
 	do
 		if(!gamemode_voted)
 			pregame_timeleft = 180
@@ -67,8 +69,8 @@ var/global/datum/controller/gameticker/ticker
 			else
 				master_mode = "extended"
 				world << "<b>Forcing the game mode to extended...</b>"
-		world << "<B><FONT color='blue'>Welcome to the pre-game lobby!</FONT></B>"
-		world << "Please, setup your character and select ready. Game will start in [pregame_timeleft] seconds"
+		world << "<B><FONT color='blue'>Добро пожаловать в пре-игровое лобби!</FONT></B>"
+		world << "Пожалуйста, настройте своего персонажа. Игра стартует через [pregame_timeleft] секунд"
 		while(current_state == GAME_STATE_PREGAME)
 			for(var/i=0, i<10, i++)
 				sleep(1)
@@ -83,7 +85,7 @@ var/global/datum/controller/gameticker/ticker
 						for(var/i=0, i<10, i++)
 							sleep(1)
 							vote.process()
-			if(pregame_timeleft <= 0 || (initialization_stage == INITIALIZATION_NOW_AND_COMPLETE))
+			if(pregame_timeleft <= 0)
 				current_state = GAME_STATE_SETTING_UP
 	while (!setup())
 
@@ -157,7 +159,7 @@ var/global/datum/controller/gameticker/ticker
 			//Deleting Startpoints but we need the ai point to AI-ize people later
 			if (S.name != "AI")
 				qdel(S)
-		world << "<FONT color='blue'><B>Enjoy the game!</B></FONT>"
+		world << "<FONT color='blue'><B>Наслаждайтесь игрой!</B></FONT>"
 		world << sound('sound/AI/welcome.ogg') // Skie
 		//Holiday Round-start stuff	~Carn
 		Holiday_Game_Start()
@@ -204,12 +206,12 @@ var/global/datum/controller/gameticker/ticker
 		var/obj/structure/bed/temp_buckle = new(src)
 		//Incredibly hackish. It creates a bed within the gameticker (lol) to stop mobs running around
 		if(station_missed)
-			for(var/mob/living/M in living_mob_list_)
+			for(var/mob/living/M in living_mob_list)
 				M.buckled = temp_buckle				//buckles the mob so it can't do anything
 				if(M.client)
 					M.client.screen += cinematic	//show every client the cinematic
 		else	//nuke kills everyone on z-level 1 to prevent "hurr-durr I survived"
-			for(var/mob/living/M in living_mob_list_)
+			for(var/mob/living/M in living_mob_list)
 				M.buckled = temp_buckle
 				if(M.client)
 					M.client.screen += cinematic
@@ -276,8 +278,8 @@ var/global/datum/controller/gameticker/ticker
 						flick("station_explode_fade_red", cinematic)
 						world << sound('sound/effects/explosionfar.ogg')
 						cinematic.icon_state = "summary_selfdes"
-				for(var/mob/living/M in living_mob_list_)
-					if(is_station_turf(get_turf(M)))
+				for(var/mob/living/M in living_mob_list)
+					if(M.loc.z in using_map.station_levels)
 						M.death()//No mercy
 		//If its actually the end of the round, wait for it to end.
 		//Otherwise if its a verb it will continue on afterwards.
@@ -320,7 +322,7 @@ var/global/datum/controller/gameticker/ticker
 		if(captainless)
 			for(var/mob/M in player_list)
 				if(!istype(M,/mob/new_player))
-					M << "Captainship not forced on anyone."
+					M << "Текущий капитан отсутствует."
 
 
 	proc/process()
@@ -343,6 +345,10 @@ var/global/datum/controller/gameticker/ticker
 		if(!mode.explosion_in_progress && game_finished && (mode_finished || post_game))
 			current_state = GAME_STATE_FINISHED
 
+			if(update_waiting)
+				force_update_server()
+			if(buildchangechecked)
+				forcechangebuild(nextbuild)
 			spawn
 				declare_completion()
 
@@ -387,36 +393,36 @@ var/global/datum/controller/gameticker/ticker
 			//call a transfer shuttle vote
 			spawn(50)
 				if(!round_end_announced) // Spam Prevention. Now it should announce only once.
-					world << "<span class='danger'>The round has ended!</span>"
+					world << "<span class='danger'>Раунд был окончен!</span>"
 					round_end_announced = 1
 				vote.autotransfer()
 
 		return 1
 
 /datum/controller/gameticker/proc/declare_completion()
-	world << "<br><br><br><H1>A round of [mode.name] has ended!</H1>"
+	world << "<br><br><br><H1>Раунд [mode.name] был окончен!</H1>"
 	for(var/mob/Player in player_list)
 		if(Player.mind && !isnewplayer(Player))
 			if(Player.stat != DEAD)
 				var/turf/playerTurf = get_turf(Player)
 				if(emergency_shuttle.departed && emergency_shuttle.evac)
 					if(isNotAdminLevel(playerTurf.z))
-						Player << "<font color='blue'><b>You managed to survive, but were marooned on [station_name()] as [Player.real_name]...</b></font>"
+						Player << "<font color='blue'><b>You managed to survive, but were marooned on [station_name()] в роли [Player.real_name]...</b></font>"
 					else
-						Player << "<font color='green'><b>You managed to survive the events on [station_name()] as [Player.real_name].</b></font>"
+						Player << "<font color='green'><b>Вам удалось пережить эту смену на [station_name()] в роли [Player.real_name].</b></font>"
 				else if(isAdminLevel(playerTurf.z))
-					Player << "<font color='green'><b>You successfully underwent crew transfer after events on [station_name()] as [Player.real_name].</b></font>"
+					Player << "<font color='green'><b>Вы успешно прошли транспортировку экипажа в этой смене на [station_name()] в роли [Player.real_name].</b></font>"
 				else if(issilicon(Player))
-					Player << "<font color='green'><b>You remain operational after the events on [station_name()] as [Player.real_name].</b></font>"
+					Player << "<font color='green'><b>You remain operational after the events on [station_name()] в роли [Player.real_name].</b></font>"
 				else
-					Player << "<font color='blue'><b>You missed the crew transfer after the events on [station_name()] as [Player.real_name].</b></font>"
+					Player << "<font color='blue'><b>Вы пропустили транспортировку экипажа в этой смене на [station_name()] в роли [Player.real_name].</b></font>"
 			else
 				if(isghost(Player))
 					var/mob/observer/ghost/O = Player
 					if(!O.started_as_observer)
-						Player << "<font color='red'><b>You did not survive the events on [station_name()]...</b></font>"
+						Player << "<font color='red'><b>Вы не пережили эту смену [station_name()]...</b></font>"
 				else
-					Player << "<font color='red'><b>You did not survive the events on [station_name()]...</b></font>"
+					Player << "<font color='red'><b>Вы не пережили эту смену [station_name()]...</b></font>"
 	world << "<br>"
 
 	for (var/mob/living/silicon/ai/aiPlayer in mob_list)
@@ -483,8 +489,8 @@ var/global/datum/controller/gameticker/ticker
 		if (needs_ghost)
 			looking_for_antags = 1
 			antag_pool.Cut()
-			world << "<b>A ghost is needed to spawn \a [antag.role_text].</b>\nGhosts may enter the antag pool by making sure their [antag.role_text] preference is set to high, then using the toggle-add-antag-candidacy verb. You have 3 minutes to enter the pool."
-			sleep(3 MINUTES)
+			world << "<b>A ghost is needed to spawn \a [antag.role_text].</b>\nGhosts may enter the antag pool by making sure their [antag.role_text] preference is set to high, then using the toggle-add-antag-candidacy verb. You have 30 seconds to enter the pool."
+			sleep(300)
 			looking_for_antags = 0
 			antag.update_current_antag_max()
 			antag.build_candidate_list(needs_ghost)
@@ -496,13 +502,12 @@ var/global/datum/controller/gameticker/ticker
 			antag.update_current_antag_max()
 			antag.build_candidate_list(needs_ghost)
 			for(var/datum/mind/candidate in antag.candidates)
-				if(isghostmind(candidate))
+				if(isghost(candidate.current))
 					antag.candidates -= candidate
 					log_debug("[candidate.key] is a ghost and can not be selected.")
 		if(length(antag.candidates) >= antag.initial_spawn_req)
 			antag.attempt_spawn()
 			antag.finalize_spawn()
-			additional_antag_types.Add(antag.id)
 			return 1
 		else
 			if(antag.initial_spawn_req > 1)

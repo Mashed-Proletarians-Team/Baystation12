@@ -51,15 +51,6 @@
 		/obj/item/weapon/newspaper
 		)
 
-/obj/item/weapon/gripper/chemistry
-	name = "chemistry gripper"
-	desc = "A simple grasping tool for chemical work."
-
-	can_hold = list(
-		/obj/item/weapon/reagent_containers/glass,
-		/obj/item/weapon/storage/pill_bottle
-		)
-
 /obj/item/weapon/gripper/research //A general usage gripper, used for toxins/robotics/xenobio/etc
 	name = "scientific gripper"
 	icon_state = "gripper-sci"
@@ -142,7 +133,10 @@
 	// Don't fall through and smack people with gripper, instead just no-op
 	return 0
 
-/obj/item/weapon/gripper/resolve_attackby(var/atom/target, var/mob/living/user, params)
+/obj/item/weapon/gripper/afterattack(var/atom/target, var/mob/living/user, proximity, params)
+
+	if(!proximity)
+		return // This will prevent them using guns at range but adminbuse can add them directly to modules, so eh.
 
 	//There's some weirdness with items being lost inside the arm. Trying to fix all cases. ~Z
 	if(!wrapped)
@@ -152,16 +146,16 @@
 
 	if(wrapped) //Already have an item.
 		//Temporary put wrapped into user so target's attackby() checks pass.
-		wrapped.loc = user //should we use forceMove() here? It is a virtual move after all, that is intended to be reset
+		wrapped.loc = user
 
 		//The force of the wrapped obj gets set to zero during the attack() and afterattack().
 		var/force_holder = wrapped.force
 		wrapped.force = 0.0
 
 		//Pass the attack on to the target. This might delete/relocate wrapped.
-		var/resolved = wrapped.resolve_attackby(target,user,params)
+		var/resolved = target.attackby(wrapped,user)
 		if(!resolved && wrapped && target)
-			wrapped.afterattack(target,user,1,params)
+			wrapped.afterattack(target,user,1)
 
 		wrapped.force = force_holder
 

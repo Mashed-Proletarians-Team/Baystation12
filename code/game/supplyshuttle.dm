@@ -25,6 +25,12 @@ var/list/mechtoys = list(
 	name = "supply manifest"
 	var/is_copy = 1
 
+/area/supply/station
+	name = "Supply Shuttle"
+	icon_state = "shuttle3"
+	requires_power = 0
+	base_turf = /turf/simulated/floor/plating
+
 /area/supply/dock
 	name = "Supply Shuttle"
 	icon_state = "shuttle3"
@@ -110,8 +116,6 @@ var/list/mechtoys = list(
 	var/decl/hierarchy/supply_pack/object = null
 	var/orderedby = null
 	var/comment = null
-	var/reason = null
-	var/orderedrank = null //used for supply console printing
 
 /datum/controller/supply
 	//supply points
@@ -125,21 +129,12 @@ var/list/mechtoys = list(
 	var/ordernum
 	var/list/shoppinglist = list()
 	var/list/requestlist = list()
-	var/list/master_supply_list = list()
 	//shuttle movement
 	var/movetime = 1200
 	var/datum/shuttle/ferry/supply/shuttle
 
-	var/obj/machinery/computer/supply/primaryterminal //terminal hardcopy forms will be printed to.
-
 	New()
 		ordernum = rand(1,9000)
-
-		//Build master supply list
-		for(var/decl/hierarchy/supply_pack/sp in cargo_supply_pack_root.children)
-			if(sp.is_category())
-				for(var/decl/hierarchy/supply_pack/spc in sp.children)
-					master_supply_list += spc
 
 	// Supply shuttle ticker - handles supply point regeneration
 	// This is called by the process scheduler every thirty seconds
@@ -207,8 +202,10 @@ var/list/mechtoys = list(
 	//Buyin
 	proc/buy()
 		if(!shoppinglist.len) return
+
 		var/area/area_shuttle = shuttle.get_location_area()
 		if(!area_shuttle)	return
+
 		var/list/clear_turfs = list()
 
 		for(var/turf/T in area_shuttle)
@@ -221,6 +218,7 @@ var/list/mechtoys = list(
 			if(contcount)
 				continue
 			clear_turfs += T
+
 		for(var/S in shoppinglist)
 			if(!clear_turfs.len)	break
 			var/i = rand(1,clear_turfs.len)
@@ -232,6 +230,7 @@ var/list/mechtoys = list(
 
 			var/obj/A = new SP.containertype(pickedloc)
 			A.name = "[SP.containername][SO.comment ? " ([SO.comment])":"" ]"
+
 			//supply manifest generation begin
 
 			var/obj/item/weapon/paper/manifest/slip

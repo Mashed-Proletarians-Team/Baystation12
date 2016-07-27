@@ -13,6 +13,3 @@
 	name = "mask"
 	icon = 'icons/turf/walls.dmi'
 	icon_state = "rockvault"
-
-/turf/unsimulated/floor/rescue_base
-	icon_state = "asteroidfloor"

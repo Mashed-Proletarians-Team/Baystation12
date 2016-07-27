@@ -8,11 +8,12 @@
 	taste_mult = 1.2
 	reagent_state = LIQUID
 	color = "#CF3600"
-	metabolism = REM * 0.25 // 0.05 by default. They last a while and slowly kill you.
+	metabolism = REM * 0.05 // 0.01 by default. They last a while and slowly kill you.
 	var/strength = 4 // How much damage it deals per unit
 
 /datum/reagent/toxin/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	if(strength && alien != IS_DIONA)
+		if(issmall(M)) removed *= 2 // Small bodymass, more effect from lower volume.
 		M.adjustToxLoss(strength * removed)
 
 /datum/reagent/toxin/plasticide
@@ -295,12 +296,16 @@
 	if(alien == IS_DIONA)
 		return
 
-	if(dose < 1)
-		if(dose == metabolism * 2 || prob(5))
+	var/effective_dose = dose
+	if(issmall(M))
+		effective_dose *= 2
+
+	if(effective_dose < 1)
+		if(effective_dose == metabolism * 2 || prob(5))
 			M.emote("yawn")
-	else if(dose < 1.5)
+	else if(effective_dose < 1.5)
 		M.eye_blurry = max(M.eye_blurry, 10)
-	else if(dose < 5)
+	else if(effective_dose < 5)
 		if(prob(50))
 			M.Weaken(2)
 		M.drowsyness = max(M.drowsyness, 20)
@@ -323,16 +328,20 @@
 	if(alien == IS_DIONA)
 		return
 
-	if(dose == metabolism)
+	var/effective_dose = dose
+	if(issmall(M))
+		effective_dose *= 2
+
+	if(effective_dose == metabolism)
 		M.confused += 2
 		M.drowsyness += 2
-	else if(dose < 2)
+	else if(effective_dose < 2)
 		M.Weaken(30)
 		M.eye_blurry = max(M.eye_blurry, 10)
 	else
 		M.sleeping = max(M.sleeping, 30)
 
-	if(dose > 1)
+	if(effective_dose > 1)
 		M.adjustToxLoss(removed)
 
 /datum/reagent/chloralhydrate/beer2 //disguised as normal beer for use by emagged brobots
@@ -450,12 +459,14 @@
 		return
 	M.druggy = max(M.druggy, 30)
 
-	if(dose < 1)
+	var/effective_dose = dose
+	if(issmall(M)) effective_dose *= 2
+	if(effective_dose < 1)
 		M.apply_effect(3, STUTTER)
 		M.make_dizzy(5)
 		if(prob(5))
 			M.emote(pick("twitch", "giggle"))
-	else if(dose < 2)
+	else if(effective_dose < 2)
 		M.apply_effect(3, STUTTER)
 		M.make_jittery(5)
 		M.make_dizzy(5)
@@ -508,7 +519,9 @@
 		if(istype(W, /obj/item/weapon/implant)) //TODO: Carn. give implants a dropped() or something
 			qdel(W)
 			continue
-		M.drop_from_inventory(W)
+		W.layer = initial(W.layer)
+		W.loc = M.loc
+		W.dropped(M)
 	var/mob/living/carbon/slime/new_mob = new /mob/living/carbon/slime(M.loc)
 	new_mob.a_intent = "hurt"
 	new_mob.universal_speak = 1

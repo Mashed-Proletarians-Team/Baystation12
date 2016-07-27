@@ -8,7 +8,6 @@
 /obj/machinery/drone_fabricator
 	name = "drone fabricator"
 	desc = "A large automated factory for producing maintenance drones."
-	appearance_flags = 0
 
 	density = 1
 	anchored = 1
@@ -74,6 +73,9 @@
 	if(!player || !isghost(player.mob))
 		return
 
+	if(player.banprisoned)
+		return
+
 	announce_ghost_joinleave(player, 0, "They have taken control over a maintenance drone.")
 	visible_message("\The [src] churns and grinds as it lurches into motion, disgorging a shiny new drone after a few moments.")
 	flick("h_lathe_leave",src)
@@ -85,7 +87,6 @@
 	new_drone.master_fabricator = src
 
 	drone_progress = 0
-	return new_drone
 
 /mob/observer/ghost/verb/join_as_drone()
 	set category = "Ghost"
@@ -128,8 +129,6 @@
 		fabricator = all_fabricators[choice]
 
 	if(user && fabricator && !((fabricator.stat & NOPOWER) || !fabricator.produce_drones || fabricator.drone_progress < 100))
-		var/mob/drone = fabricator.create_drone(user.client)
-		if(drone)
-			drone.status_flags |= NO_ANTAG
+		fabricator.create_drone(user.client)
 		return 1
 	return

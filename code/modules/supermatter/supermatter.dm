@@ -45,13 +45,13 @@
 
 	var/damage = 0
 	var/damage_archived = 0
-	var/safe_alert = "Crystaline hyperstructure returning to safe operating levels."
+	var/safe_alert = "Кристаллическа#&255; гиперструктура нормализуетс#&255; до безопасных уровней."
 	var/safe_warned = 0
 	var/public_alert = 0 //Stick to Engineering frequency except for big warnings when integrity bad
 	var/warning_point = 100
-	var/warning_alert = "Danger! Crystal hyperstructure instability!"
+	var/warning_alert = "Опасность! Гиперструктура кристалла нестабильна!"
 	var/emergency_point = 700
-	var/emergency_alert = "CRYSTAL DELAMINATION IMMINENT."
+	var/emergency_alert = "ДЕЛАМИНАЦИЯ КРИСТАЛЛА СУПЕРМАТЕРИИ НЕИЗБЕЖНА."
 	var/explosion_point = 1000
 
 	light_color = "#8A8A00"
@@ -100,7 +100,7 @@
 	anchored = 1
 	grav_pulling = 1
 	exploded = 1
-	for(var/mob/living/mob in living_mob_list_)
+	for(var/mob/living/mob in living_mob_list)
 		var/turf/T = get_turf(mob)
 		if(T && (loc.z == T.z))
 			if(istype(mob, /mob/living/carbon/human))
@@ -128,7 +128,7 @@
 
 /obj/machinery/power/supermatter/proc/announce_warning()
 	var/integrity = get_integrity()
-	var/alert_msg = " Integrity at [integrity]%"
+	var/alert_msg = " Целость кристалла [integrity] процентов."
 
 	if(damage > emergency_point)
 		alert_msg = emergency_alert + alert_msg
@@ -144,13 +144,13 @@
 	else
 		alert_msg = null
 	if(alert_msg)
-		radio.autosay(alert_msg, "Supermatter Monitor", "Engineering")
+		radio.autosay(alert_msg, "Мониторинг Суперматерии", "Engineering")
 		//Public alerts
 		if((damage > emergency_point) && !public_alert)
-			radio.autosay("WARNING: SUPERMATTER CRYSTAL DELAMINATION IMMINENT!", "Supermatter Monitor")
+			radio.autosay("ВНИАНИЕ: ДЕЛАМИНАЦИЯ КРИСТАЛЛА СУПЕРМАТЕРИИ НЕИЗБЕЖНА!", "Мониторинг Суперматерии")
 			public_alert = 1
 		else if(safe_warned && public_alert)
-			radio.autosay(alert_msg, "Supermatter Monitor")
+			radio.autosay(alert_msg, "Мониторинг Суперматерии")
 			public_alert = 0
 
 
@@ -216,7 +216,7 @@
 
 		//Ok, 100% oxygen atmosphere = best reaction
 		//Maxes out at 100% oxygen pressure
-		oxygen = Clamp((removed.get_by_flag(XGM_GAS_OXIDIZER) - (removed.gas["nitrogen"] * NITROGEN_RETARDATION_FACTOR)) / removed.total_moles, 0, 1)
+		oxygen = max(min((removed.gas["oxygen"] - (removed.gas["nitrogen"] * NITROGEN_RETARDATION_FACTOR)) / removed.total_moles, 1), 0)
 
 		//calculate power gain for oxygen reaction
 		var/temp_factor

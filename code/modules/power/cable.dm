@@ -91,18 +91,6 @@ var/list/possible_cable_coil_colours
 	cable_list -= src							//remove it from global cable list
 	..()										// then go ahead and delete the cable
 
-
-// Ghost examining the cable -> tells him the power
-/obj/structure/cable/attack_ghost(mob/user)
-	if(user.client && user.client.inquisitive_ghost)
-		user.examinate(src)
-		// following code taken from attackby (multitool)
-		if(powernet && (powernet.avail > 0))
-			user << "<span class='warning'>[powernet.avail]W in power network.</span>"
-		else
-			user << "<span class='warning'>The cable is not powered.</span>"
-	return
-
 ///////////////////////////////////
 // General procedures
 ///////////////////////////////////
@@ -465,7 +453,6 @@ obj/structure/cable/proc/cableColor(var/colorC)
 	name = "cable coil"
 	icon = 'icons/obj/power.dmi'
 	icon_state = "coil"
-	randpixel = 2
 	amount = MAXCOIL
 	max_amount = MAXCOIL
 	color = COLOR_RED
@@ -494,6 +481,8 @@ obj/structure/cable/proc/cableColor(var/colorC)
 	src.amount = length
 	if (param_color) // It should be red by default, so only recolor it if parameter was specified.
 		color = param_color
+	pixel_x = rand(-2,2)
+	pixel_y = rand(-2,2)
 	update_icon()
 	update_wclass()
 
@@ -842,6 +831,8 @@ obj/structure/cable/proc/cableColor(var/colorC)
 /obj/item/stack/cable_coil/cut/New(loc)
 	..()
 	src.amount = rand(1,2)
+	pixel_x = rand(-2,2)
+	pixel_y = rand(-2,2)
 	update_icon()
 	update_wclass()
 

@@ -3,12 +3,11 @@
 	desc = "A security robot.  He looks less than thrilled."
 	icon = 'icons/obj/aibots.dmi'
 	icon_state = "ed2090"
-	attack_state = "ed209-c"
 	density = 1
 	health = 100
 	maxHealth = 100
 
-	bot_version = 2.6
+	bot_version = "2.5"
 	is_ranged = 1
 	preparing_arrest_sounds = new()
 
@@ -19,6 +18,12 @@
 
 	var/shot_delay = 4
 	var/last_shot = 0
+
+/mob/living/bot/secbot/ed209/update_icons()
+	if(on && is_attacking)
+		icon_state = "ed209-c"
+	else
+		icon_state = "ed209[on]"
 
 /mob/living/bot/secbot/ed209/explode()
 	visible_message("<span class='warning'>[src] blows apart!</span>")

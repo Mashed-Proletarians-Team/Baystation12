@@ -14,7 +14,6 @@ var/datum/antagonist/raider/raiders
 	hard_cap_round = 10
 	initial_spawn_req = 4
 	initial_spawn_target = 6
-	min_player_age = 14
 
 	id_type = /obj/item/weapon/card/id/syndicate
 
@@ -68,7 +67,6 @@ var/datum/antagonist/raider/raiders
 		/obj/item/weapon/gun/energy/laser,
 		/obj/item/weapon/gun/energy/retro,
 		/obj/item/weapon/gun/energy/xray,
-		/obj/item/weapon/gun/energy/xray/pistol,
 		/obj/item/weapon/gun/energy/mindflayer,
 		/obj/item/weapon/gun/energy/toxgun,
 		/obj/item/weapon/gun/energy/stunrevolver,

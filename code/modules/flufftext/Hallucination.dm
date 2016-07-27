@@ -124,10 +124,9 @@ mob/living/carbon/proc/handle_hallucinations()
 					if(8) src << 'sound/machines/windowdoor.ogg'
 					if(9)
 						//To make it more realistic, I added two gunshots (enough to kill)
-						var/gunshot = pick('sound/weapons/gunshot/gunshot_strong.ogg', 'sound/weapons/gunshot/gunshot2.ogg', 'sound/weapons/gunshot/shotgun.ogg', 'sound/weapons/gunshot/gunshot.ogg')
-						src << gunshot
+						src << 'sound/weapons/Gunshot.ogg'
 						spawn(rand(10,30))
-							src << gunshot
+							src << 'sound/weapons/Gunshot.ogg'
 					if(10) src << 'sound/weapons/smash.ogg'
 					if(11)
 						//Same as above, but with tasers.
@@ -354,7 +353,7 @@ var/list/non_fakeattack_weapons = list(/obj/item/weapon/gun/projectile, /obj/ite
 	var/mob/living/carbon/human/clone = null
 	var/clone_weapon = null
 
-	for(var/mob/living/carbon/human/H in living_mob_list_)
+	for(var/mob/living/carbon/human/H in living_mob_list)
 		if(H.stat || H.lying) continue
 //		possible_clones += H
 		clone = H

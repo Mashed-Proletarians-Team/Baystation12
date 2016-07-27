@@ -14,7 +14,6 @@ obj/machinery/atmospherics/pipe/simple/heat_exchanging
 	minimum_temperature_difference = 20
 	thermal_conductivity = OPEN_HEAT_TRANSFER_COEFFICIENT
 
-	can_buckle = 1
 	buckle_lying = 1
 
 	// BubbleWrap

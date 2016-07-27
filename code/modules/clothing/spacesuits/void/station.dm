@@ -1,9 +1,8 @@
 // Station voidsuits
-
-//Engineering
+//Engineering rig
 /obj/item/clothing/head/helmet/space/void/engineering
 	name = "engineering voidsuit helmet"
-	desc = "A sturdy looking voidsuit helmet rated to protect against radiation."
+	desc = "A special helmet designed for work in a hazardous, low-pressure environment. Has radiation shielding."
 	icon_state = "rig0-engineering"
 	item_state = "eng_helm"
 	item_state_slots = list(
@@ -14,20 +13,20 @@
 
 /obj/item/clothing/suit/space/void/engineering
 	name = "engineering voidsuit"
-	desc = "A run-of-the-mill service voidsuit with all the plating and radiation protection required for industrial work in vacuum."
+	desc = "A special suit that protects against hazardous, low pressure environments. Has radiation shielding."
 	icon_state = "rig-engineering"
 	item_state = "eng_voidsuit"
 	armor = list(melee = 40, bullet = 5, laser = 20,energy = 5, bomb = 35, bio = 100, rad = 80)
-	allowed = list(/obj/item/device/flashlight,/obj/item/weapon/tank,/obj/item/device/suit_cooling_unit,/obj/item/weapon/storage/toolbox,/obj/item/weapon/storage/briefcase/inflatable,/obj/item/device/t_scanner,/obj/item/weapon/rcd)
+	allowed = list(/obj/item/device/flashlight,/obj/item/weapon/tank,/obj/item/device/suit_cooling_unit,/obj/item/weapon/storage/bag/ore,/obj/item/device/t_scanner,/obj/item/weapon/pickaxe, /obj/item/weapon/rcd)
 
 /obj/item/clothing/suit/space/void/engineering/New()
 	..()
 	slowdown_per_slot[slot_wear_suit] = 1
 
-//Mining
+//Mining rig
 /obj/item/clothing/head/helmet/space/void/mining
 	name = "mining voidsuit helmet"
-	desc = "A scuffed voidsuit helmet with a boosted communication system and reinforced armor plating."
+	desc = "A special helmet designed for work in a hazardous, low pressure environment. Has reinforced plating."
 	icon_state = "rig0-mining"
 	item_state = "mining_helm"
 	item_state_slots = list(
@@ -40,15 +39,14 @@
 /obj/item/clothing/suit/space/void/mining
 	icon_state = "rig-mining"
 	name = "mining voidsuit"
-	desc = "A grimy, decently armored voidsuit with purple blazes and extra insulation."
+	desc = "A special suit that protects against hazardous, low pressure environments. Has reinforced plating."
 	item_state = "mining_voidsuit"
 	armor = list(melee = 50, bullet = 5, laser = 20,energy = 5, bomb = 55, bio = 100, rad = 20)
-	allowed = list(/obj/item/device/flashlight,/obj/item/weapon/tank,/obj/item/stack/flag,/obj/item/device/suit_cooling_unit,/obj/item/weapon/storage/ore,/obj/item/device/t_scanner,/obj/item/weapon/pickaxe, /obj/item/weapon/rcd)
 
-//Medical
+//Medical Rig
 /obj/item/clothing/head/helmet/space/void/medical
 	name = "medical voidsuit helmet"
-	desc = "A bulbous voidsuit helmet with minor radiation shielding and a massive visor."
+	desc = "A special helmet designed for work in a hazardous, low pressure environment. Has minor radiation shielding."
 	icon_state = "rig0-medical"
 	item_state = "medical_helm"
 	item_state_slots = list(
@@ -60,15 +58,15 @@
 /obj/item/clothing/suit/space/void/medical
 	icon_state = "rig-medical"
 	name = "medical voidsuit"
-	desc = "A sterile voidsuit with minor radiation shielding and a suite of self-cleaning technology. Standard issue in NanoTrasen medical facilities."
+	desc = "A special suit that protects against hazardous, low pressure environments. Has minor radiation shielding."
 	item_state = "medical_voidsuit"
 	allowed = list(/obj/item/device/flashlight,/obj/item/weapon/tank,/obj/item/device/suit_cooling_unit,/obj/item/weapon/storage/firstaid,/obj/item/device/healthanalyzer,/obj/item/stack/medical)
 	armor = list(melee = 30, bullet = 5, laser = 20,energy = 5, bomb = 25, bio = 100, rad = 50)
 
-//Security
+	//Security
 /obj/item/clothing/head/helmet/space/void/security
 	name = "security voidsuit helmet"
-	desc = "A comfortable voidsuit helmet with cranial armor and eight-channel surround sound."
+	desc = "A special helmet designed for work in a hazardous, low pressure environment. Has an additional layer of armor."
 	icon_state = "rig0-sec"
 	item_state = "sec_helm"
 	item_state_slots = list(
@@ -82,15 +80,15 @@
 /obj/item/clothing/suit/space/void/security
 	icon_state = "rig-sec"
 	name = "security voidsuit"
-	desc = "A somewhat clumsy voidsuit layered with impact and laser-resistant armor plating. Specially designed to dissipate minor electrical charges."
+	desc = "A special suit that protects against hazardous, low pressure environments. Has an additional layer of armor."
 	item_state = "sec_voidsuit"
 	armor = list(melee = 60, bullet = 10, laser = 30, energy = 5, bomb = 45, bio = 100, rad = 10)
 	allowed = list(/obj/item/weapon/gun,/obj/item/device/flashlight,/obj/item/weapon/tank,/obj/item/device/suit_cooling_unit,/obj/item/weapon/melee/baton)
 	siemens_coefficient = 0.7
 
-//Atmospherics
+//Atmospherics Rig (BS12)
 /obj/item/clothing/head/helmet/space/void/atmos
-	desc = "A flame-retardant voidsuit helmet with a self-repairing visor and light anti-radiation shielding."
+	desc = "A special helmet designed for work in a hazardous, low pressure environments. Has improved thermal protection and minor radiation shielding."
 	name = "atmospherics voidsuit helmet"
 	icon_state = "rig0-atmos"
 	item_state = "atmos_helm"
@@ -103,7 +101,7 @@
 	light_overlay = "helmet_light_dual"
 
 /obj/item/clothing/suit/space/void/atmos
-	desc = "A durable voidsuit with advanced temperature-regulation systems as well as minor radiation protection. Well worth the price."
+	desc = "A special suit that protects against hazardous, low pressure environments. Has improved thermal protection and minor radiation shielding."
 	icon_state = "rig-atmos"
 	name = "atmos voidsuit"
 	item_state = "atmos_voidsuit"

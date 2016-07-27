@@ -16,16 +16,12 @@
 	var/SA_para_min = 1
 	var/SA_sleep_min = 5
 
-/obj/item/organ/lungs/robotize()
-	. = ..()
-	icon_state = "lungs-prosthetic"
-
 /obj/item/organ/lungs/set_dna(var/datum/dna/new_dna)
 	..()
 	min_breath_pressure = species.breath_pressure
 	breath_type = species.breath_type ? species.breath_type : "oxygen"
 	poison_type = species.poison_type ? species.poison_type : "phoron"
-	exhale_type = species.exhale_type ? species.exhale_type : "carbon_dioxide"
+	exhale_type = species.exhale_type ? species.exhale_type : 0
 
 /obj/item/organ/lungs/process()
 	..()
@@ -45,23 +41,17 @@
 			spawn owner.emote("me", 1, "gasps for air!")
 			owner.losebreath += 15
 
-/obj/item/organ/lungs/proc/rupture()
-	var/obj/item/organ/external/parent = owner.get_organ(parent_organ)
-	if(istype(parent))
-		owner.custom_pain("You feel a stabbing pain in your [parent.name]!", 1)
-	bruise()
 
 /obj/item/organ/lungs/proc/handle_breath(datum/gas_mixture/breath)
 	if(!owner)
-		return 1
+		return 0
 	if(!breath)
-		return 1
+		return 0
 	//exposure to extreme pressures can rupture lungs
 	if(breath.total_moles < BREATH_MOLES / 5 || breath.total_moles > BREATH_MOLES * 5)
-		if(!is_bruised() && prob(5)) //only rupture if NOT already ruptured
-			rupture()
-	if(breath.total_moles == 0)
-		return 1
+		if(is_bruised() && prob(5))
+			owner.custom_pain("You feel a stabbing pain in your chest!", 1)
+			bruise()
 
 	var/safe_pressure_min = min_breath_pressure // Minimum safe partial pressure of breathable gas in kPa
 	// Lung damage increases the minimum safe pressure.
@@ -159,7 +149,7 @@
 	handle_temperature_effects(breath)
 
 	breath.update_values()
-	return failed_breath
+	return !failed_breath
 
 /obj/item/organ/lungs/proc/handle_temperature_effects(datum/gas_mixture/breath)
 	// Hot air hurts :(

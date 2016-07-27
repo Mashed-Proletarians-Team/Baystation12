@@ -93,8 +93,6 @@
 	icon_state = "ert_uniform"
 	item_state = "bl_suit"
 	worn_state = "ert_uniform"
-	armor = list(melee = 10, bullet = 5, laser = 5,energy = 0, bomb = 0, bio = 0, rad = 0)
-	siemens_coefficient = 0.9
 
 /obj/item/clothing/under/space
 	name = "\improper NASA jumpsuit"
@@ -522,10 +520,3 @@
 	icon_state = "blue_blazer"
 	item_state = "blue_blazer"
 	worn_state = "blue_blazer"
-
-/obj/item/clothing/under/pcrc
-	name = "\improper PCRC uniform"
-	desc = "A uniform belonging to Proxima Centauri Risk Control, a private security firm."
-	icon_state = "pcrc"
-	item_state = "jensensuit"
-	worn_state = "pcrc"

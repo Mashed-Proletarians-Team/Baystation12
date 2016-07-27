@@ -1,10 +1,3 @@
-/mob/living/New()
-	..()
-	if(stat == DEAD)
-		add_to_dead_mob_list()
-	else
-		add_to_living_mob_list()
-
 //mob verbs are faster than object verbs. See mob/verb/examine.
 /mob/living/verb/pulled(atom/movable/AM as mob|obj in oview(1))
 	set name = "Pull"
@@ -24,7 +17,7 @@
 	if(!..())
 		return 0
 
-	usr.visible_message("<b>[src]</b> points to [A]")
+	usr.visible_message("<b>[src]</b> указывает на [A]")
 	return 1
 
 /*one proc, four uses
@@ -244,14 +237,14 @@ default behaviour is:
 
 /mob/living/proc/adjustBruteLoss(var/amount)
 	if(status_flags & GODMODE)	return 0	//godmode
-	bruteloss = min(max(bruteloss + amount, 0),(maxHealth - config.health_threshold_dead))
+	bruteloss = min(max(bruteloss + amount, 0),(maxHealth*2))
 
 /mob/living/proc/getOxyLoss()
 	return oxyloss
 
 /mob/living/proc/adjustOxyLoss(var/amount)
 	if(status_flags & GODMODE)	return 0	//godmode
-	oxyloss = min(max(oxyloss + amount, 0),(maxHealth - config.health_threshold_dead))
+	oxyloss = min(max(oxyloss + amount, 0),(maxHealth*2))
 
 /mob/living/proc/setOxyLoss(var/amount)
 	if(status_flags & GODMODE)	return 0	//godmode
@@ -262,7 +255,7 @@ default behaviour is:
 
 /mob/living/proc/adjustToxLoss(var/amount)
 	if(status_flags & GODMODE)	return 0	//godmode
-	toxloss = min(max(toxloss + amount, 0),(maxHealth - config.health_threshold_dead))
+	toxloss = min(max(toxloss + amount, 0),(maxHealth*2))
 
 /mob/living/proc/setToxLoss(var/amount)
 	if(status_flags & GODMODE)	return 0	//godmode
@@ -273,14 +266,14 @@ default behaviour is:
 
 /mob/living/proc/adjustFireLoss(var/amount)
 	if(status_flags & GODMODE)	return 0	//godmode
-	fireloss = min(max(fireloss + amount, 0),(maxHealth - config.health_threshold_dead))
+	fireloss = min(max(fireloss + amount, 0),(maxHealth*2))
 
 /mob/living/proc/getCloneLoss()
 	return cloneloss
 
 /mob/living/proc/adjustCloneLoss(var/amount)
 	if(status_flags & GODMODE)	return 0	//godmode
-	cloneloss = min(max(cloneloss + amount, 0),(maxHealth - config.health_threshold_dead))
+	cloneloss = min(max(cloneloss + amount, 0),(maxHealth*2))
 
 /mob/living/proc/setCloneLoss(var/amount)
 	if(status_flags & GODMODE)	return 0	//godmode
@@ -291,7 +284,7 @@ default behaviour is:
 
 /mob/living/proc/adjustBrainLoss(var/amount)
 	if(status_flags & GODMODE)	return 0	//godmode
-	brainloss = min(max(brainloss + amount, 0),(maxHealth - config.health_threshold_dead))
+	brainloss = min(max(brainloss + amount, 0),(maxHealth*2))
 
 /mob/living/proc/setBrainLoss(var/amount)
 	if(status_flags & GODMODE)	return 0	//godmode
@@ -302,7 +295,7 @@ default behaviour is:
 
 /mob/living/proc/adjustHalLoss(var/amount)
 	if(status_flags & GODMODE)	return 0	//godmode
-	halloss = min(max(halloss + amount, 0),(maxHealth - config.health_threshold_dead))
+	halloss = min(max(halloss + amount, 0),(maxHealth*2))
 
 /mob/living/proc/setHalLoss(var/amount)
 	if(status_flags & GODMODE)	return 0	//godmode
@@ -462,7 +455,8 @@ default behaviour is:
 
 	// remove the character from the list of the dead
 	if(stat == DEAD)
-		switch_from_dead_to_living_mob_list()
+		dead_mob_list -= src
+		living_mob_list += src
 		tod = null
 		timeofdeath = 0
 
@@ -477,7 +471,7 @@ default behaviour is:
 	BITSET(hud_updateflag, LIFE_HUD)
 
 	failed_last_breath = 0 //So mobs that died of oxyloss don't revive and have perpetual out of breath.
-	reload_fullscreen()
+
 	return
 
 /mob/living/proc/UpdateDamageIcon()
@@ -780,19 +774,8 @@ default behaviour is:
 		if(new_area)
 			new_area.Entered(src)
 
-//called when the mob receives a bright flash
-/mob/living/flash_eyes(intensity = FLASH_PROTECTION_MODERATE, override_blindness_check = FALSE, affect_silicon = FALSE, visual = FALSE, type = /obj/screen/fullscreen/flash)
-	if(override_blindness_check || !(disabilities & BLIND))
-		overlay_fullscreen("flash", type)
-		spawn(25)
-			if(src)
-				clear_fullscreen("flash", 25)
-		return 1
-
 /mob/living/proc/cannot_use_vents()
-	if(mob_size > MOB_SMALL)
-		return "You can't fit into that vent."
-	return null
+	return "You can't fit into that vent."
 
 /mob/living/proc/has_brain()
 	return 1
@@ -808,16 +791,36 @@ default behaviour is:
 		return
 	. = ..()
 
+/mob/living/touch_map_edge()
+
+	//check for nuke disks
+	if(client && stat != DEAD) //if they are clientless and dead don't bother, the parent will treat them as any other container
+		if(ticker && istype(ticker.mode, /datum/game_mode/nuclear)) //only really care if the game mode is nuclear
+			var/datum/game_mode/nuclear/G = ticker.mode
+			if(G.check_mob(src))
+				if(x <= TRANSITIONEDGE)
+					inertia_dir = 4
+				else if(x >= world.maxx -TRANSITIONEDGE)
+					inertia_dir = 8
+				else if(y <= TRANSITIONEDGE)
+					inertia_dir = 1
+				else if(y >= world.maxy -TRANSITIONEDGE)
+					inertia_dir = 2
+				src << "<span class='warning'>Something you are carrying is preventing you from leaving.</span>"
+				return
+
+	..()
+
 //damage/heal the mob ears and adjust the deaf amount
 /mob/living/adjustEarDamage(var/damage, var/deaf)
 	ear_damage = max(0, ear_damage + damage)
 	ear_deaf = max(0, ear_deaf + deaf)
 
 //pass a negative argument to skip one of the variable
-/mob/living/setEarDamage(var/damage = null, var/deaf = null)
-	if(!isnull(damage))
+/mob/living/setEarDamage(var/damage, var/deaf)
+	if(damage >= 0)
 		ear_damage = damage
-	if(!isnull(deaf))
+	if(deaf >= 0)
 		ear_deaf = deaf
 
 /mob/proc/can_be_possessed_by(var/mob/observer/ghost/possessor)

@@ -20,44 +20,35 @@
 		)
 
 /obj/item/weapon/gun/projectile/automatic/mini_uzi
-	name = ".45 machine pistol"
-	desc = "An uncommon machine pistol, sometimes refered to as an 'uzi' by the backwater spacers it is often associated with, though its origins have been lost to time. Uses .45 rounds."
+	name = "\improper Uzi"
+	desc = "The UZI is a lightweight, fast firing gun. For when you want someone dead. Uses .45 rounds."
 	icon_state = "mini-uzi"
-	item_state = "wt550"
 	w_class = 3
-	load_method = MAGAZINE
+	load_method = SPEEDLOADER //yup. until someone sprites a magazine for it.
+	max_shells = 15
 	caliber = ".45"
-	origin_tech = list(TECH_COMBAT = 5, TECH_MATERIAL = 2, TECH_ILLEGAL = 3)
-	slot_flags = SLOT_BELT
+	origin_tech = list(TECH_COMBAT = 5, TECH_MATERIAL = 2, TECH_ILLEGAL = 8)
 	ammo_type = /obj/item/ammo_casing/c45
-	allowed_magazines = /obj/item/ammo_magazine/c45uzi //more damage compared to the wt550, smaller mag size
 
+	//PDW
 	firemodes = list(
-		list(mode_name="semiauto",       burst=1, fire_delay=0,    move_delay=null, requires_two_hands=0, burst_accuracy=null, dispersion=null),
-		list(mode_name="3-round bursts", burst=3, fire_delay=null, move_delay=4,    requires_two_hands=1, burst_accuracy=list(0,-1,-1),       dispersion=list(0.0, 0.6, 1.0)),
-		list(mode_name="short bursts",   burst=5, fire_delay=null, move_delay=4,    requires_two_hands=2, burst_accuracy=list(0,-1,-1,-1,-2), dispersion=list(0.6, 0.6, 1.0, 1.0, 1.2)),
+		list(mode_name="semiauto",       burst=1, fire_delay=0,    move_delay=null, requires_two_hands=1, burst_accuracy=null, dispersion=null),
+		list(mode_name="3-round bursts", burst=3, fire_delay=null, move_delay=4,    requires_two_hands=2, burst_accuracy=list(0,-1,-1),       dispersion=list(0.0, 0.6, 1.0)),
+		list(mode_name="short bursts",   burst=5, fire_delay=null, move_delay=4,    requires_two_hands=3, burst_accuracy=list(0,-1,-1,-1,-2), dispersion=list(0.6, 0.6, 1.0, 1.0, 1.2)),
 		)
-
-/obj/item/weapon/gun/projectile/automatic/mini_uzi/update_icon()
-	..()
-	if(ammo_magazine)
-		icon_state = "mini-uzi"
-	else
-		icon_state = "mini-uzi-empty"
 
 /obj/item/weapon/gun/projectile/automatic/c20r
 	name = "submachine gun"
 	desc = "The C-20r is a lightweight and rapid firing SMG, for when you REALLY need someone dead. Uses 10mm rounds. Has a 'Scarborough Arms - Per falcis, per pravitas' buttstamp."
 	icon_state = "c20r"
 	item_state = "c20r"
-	w_class = 4
+	w_class = 3
 	force = 10
 	caliber = "10mm"
 	origin_tech = list(TECH_COMBAT = 5, TECH_MATERIAL = 2, TECH_ILLEGAL = 8)
 	slot_flags = SLOT_BELT|SLOT_BACK
 	load_method = MAGAZINE
 	magazine_type = /obj/item/ammo_magazine/a10mm
-	allowed_magazines = /obj/item/ammo_magazine/a10mm
 	auto_eject = 1
 	auto_eject_sound = 'sound/weapons/smg_empty_alarm.ogg'
 	requires_two_hands = 1
@@ -79,17 +70,16 @@
 
 /obj/item/weapon/gun/projectile/automatic/sts35
 	name = "assault rifle"
-	desc = "The rugged STS-35 is a durable automatic weapon of a make popular on the frontier worlds. The serial number has been scratched off. Uses 7.62mm rounds."
+	desc = "The rugged STS-35 is a durable automatic weapon of a make popular on the frontier worlds. Uses 7.62mm rounds. This one is unmarked."
 	icon_state = "arifle"
 	item_state = null
 	w_class = 5
 	force = 10
 	caliber = "a762"
-	origin_tech = list(TECH_COMBAT = 6, TECH_MATERIAL = 1, TECH_ILLEGAL = 5)
+	origin_tech = list(TECH_COMBAT = 6, TECH_MATERIAL = 1, TECH_ILLEGAL = 4)
 	slot_flags = SLOT_BACK
 	load_method = MAGAZINE
 	magazine_type = /obj/item/ammo_magazine/c762
-	allowed_magazines = /obj/item/ammo_magazine/c762
 	requires_two_hands = 3
 
 	//Assault rifle, burst fire degrades quicker than SMG, worse one-handing penalty, slightly increased move delay
@@ -99,12 +89,13 @@
 		list(mode_name="short bursts",   burst=5, fire_delay=null, move_delay=6,    requires_two_hands=6, burst_accuracy=list(0,-1,-2,-3,-3), dispersion=list(0.6, 1.0, 1.2, 1.2, 1.5)),
 		)
 
-/obj/item/weapon/gun/projectile/automatic/sts35/update_icon()
+/obj/item/weapon/gun/projectile/automatic/sts35/update_icon(var/ignore_inhands)
 	..()
 	icon_state = (ammo_magazine)? "arifle" : "arifle-empty"
+	if(!ignore_inhands) update_twohanding()
 
 /obj/item/weapon/gun/projectile/automatic/wt550
-	name = "9mm machine pistol"
+	name = "machine pistol"
 	desc = "The W-T 550 Saber is a cheap self-defense weapon, mass-produced by Ward-Takahashi for paramilitary and private use. Uses 9mm rounds."
 	icon_state = "wt550"
 	item_state = "wt550"
@@ -112,10 +103,9 @@
 	caliber = "9mm"
 	origin_tech = list(TECH_COMBAT = 5, TECH_MATERIAL = 2)
 	slot_flags = SLOT_BELT
-	ammo_type = /obj/item/ammo_casing/c9mm/rubber
+	ammo_type = /obj/item/ammo_casing/c9mmr
 	load_method = MAGAZINE
 	magazine_type = /obj/item/ammo_magazine/mc9mmt/rubber
-	allowed_magazines = /obj/item/ammo_magazine/mc9mmt
 
 	//machine pistol, like SMG but easier to one-hand with
 	firemodes = list(
@@ -145,7 +135,6 @@
 	slot_flags = SLOT_BACK
 	load_method = MAGAZINE
 	magazine_type = /obj/item/ammo_magazine/a556
-	allowed_magazines = /obj/item/ammo_magazine/a556
 	auto_eject = 1
 	auto_eject_sound = 'sound/weapons/smg_empty_alarm.ogg'
 	requires_two_hands = 5
@@ -205,7 +194,7 @@
 
 /obj/item/weapon/gun/projectile/automatic/l6_saw
 	name = "light machine gun"
-	desc = "A rather traditionally made L6 SAW with a pleasantly lacquered wooden pistol grip. Has 'Aussec Armoury- 2531' engraved on the reciever." //probably should refluff this
+	desc = "A rather traditionally made L6 SAW with a pleasantly lacquered wooden pistol grip. Has 'Aussec Armoury- 2531' engraved on the reciever."
 	icon_state = "l6closed100"
 	item_state = "l6closedmag"
 	w_class = 5
@@ -214,11 +203,10 @@
 	max_shells = 50
 	caliber = "a762"
 	origin_tech = list(TECH_COMBAT = 6, TECH_MATERIAL = 1, TECH_ILLEGAL = 2)
-	slot_flags = 0 //need sprites for SLOT_BACK
+	slot_flags = SLOT_BACK
 	ammo_type = /obj/item/ammo_casing/a762
 	load_method = MAGAZINE
-	magazine_type = /obj/item/ammo_magazine/box/a762
-	allowed_magazines = list(/obj/item/ammo_magazine/box/a762, /obj/item/ammo_magazine/c762)
+	magazine_type = /obj/item/ammo_magazine/a762
 	requires_two_hands = 6
 
 	//LMG, better sustained fire accuracy than assault rifles (comparable to SMG), higer move delay and one-handing penalty
@@ -229,9 +217,6 @@
 		)
 
 	var/cover_open = 0
-
-/obj/item/weapon/gun/projectile/automatic/l6_saw/mag
-	magazine_type = /obj/item/ammo_magazine/c762
 
 /obj/item/weapon/gun/projectile/automatic/l6_saw/special_check(mob/user)
 	if(cover_open)
@@ -257,20 +242,11 @@
 		return ..() //once open, behave like normal
 
 /obj/item/weapon/gun/projectile/automatic/l6_saw/update_icon()
-	if(istype(ammo_magazine, /obj/item/ammo_magazine/box))
-		icon_state = "l6[cover_open ? "open" : "closed"][round(ammo_magazine.stored_ammo.len, 25)]"
-		item_state = "l6[cover_open ? "open" : "closed"]"
-	else if(ammo_magazine)
-		icon_state = "l6[cover_open ? "open" : "closed"]mag"
-		item_state = "l6[cover_open ? "open" : "closed"]mag"
-	else
-		icon_state = "l6[cover_open ? "open" : "closed"]-empty"
-		item_state = "l6[cover_open ? "open" : "closed"]-empty"
-	..()
+	icon_state = "l6[cover_open ? "open" : "closed"][ammo_magazine ? round(ammo_magazine.stored_ammo.len, 25) : "-empty"]"
 
 /obj/item/weapon/gun/projectile/automatic/l6_saw/load_ammo(var/obj/item/A, mob/user)
 	if(!cover_open)
-		user << "<span class='warning'>You need to open the cover to load that into [src].</span>"
+		user << "<span class='warning'>You need to open the cover to load [src].</span>"
 		return
 	..()
 

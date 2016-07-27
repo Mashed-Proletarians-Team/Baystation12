@@ -35,7 +35,7 @@
 		usr << "<span class='danger'>You have deadchat muted.</span>"
 		return
 
-	say_dead_direct("[pick("complains","moans","whines","laments","blubbers")], <span class='message'>\"[message]\"</span>", src)
+	say_dead_direct("[pick("говорит","хнычет","ноет")], <span class='message'>\"[message]\"</span>", src)
 
 /mob/proc/say_understands(var/mob/other,var/datum/language/speaking = null)
 
@@ -74,11 +74,11 @@
 		return speaking.get_spoken_verb(ending)
 
 	var/verb = pick(speak_emote)
-	if(verb == "says") //a little bit of a hack, but we can't let speak_emote default to an empty list without breaking other things
+	if(verb == "говорит") //a little bit of a hack, but we can't let speak_emote default to an empty list without breaking other things
 		if(ending == "!")
-			verb = pick("exclaims","shouts","yells")
+			verb = pick("восклицает","кричит","вопит")
 		else if(ending == "?")
-			verb ="asks"
+			verb = "спрашивает"
 	return verb
 
 /mob/proc/emote(var/act, var/type, var/message)

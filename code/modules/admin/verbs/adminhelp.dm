@@ -1,7 +1,3 @@
-
-//This is a list of words which are ignored by the parser when comparing message contents for names. MUST BE IN LOWER CASE!
-var/list/adminhelp_ignored_words = list("unknown","the","a","an","of","monkey","alien","as")
-
 /client/verb/adminhelp(msg as text)
 	set category = "Admin"
 	set name = "Adminhelp"
@@ -31,7 +27,8 @@ var/list/adminhelp_ignored_words = list("unknown","the","a","an","of","monkey","
 	var/list/ckeys = list()
 	for(var/mob/M in mob_list)
 		var/list/indexing = list(M.real_name, M.name)
-		if(M.mind)	indexing += M.mind.name
+		if(M.mind)
+			indexing += M.mind.name
 
 		for(var/string in indexing)
 			var/list/L = splittext(string, " ")
@@ -57,23 +54,22 @@ var/list/adminhelp_ignored_words = list("unknown","the","a","an","of","monkey","
 	for(var/original_word in msglist)
 		var/word = ckey(original_word)
 		if(word)
-			if(!(word in adminhelp_ignored_words))
-				if(word == "ai")
-					ai_found = 1
-				else
-					var/mob/found = ckeys[word]
+			if(word == "ai")
+				ai_found = 1
+			else
+				var/mob/found = ckeys[word]
+				if(!found)
+					found = surnames[word]
 					if(!found)
-						found = surnames[word]
-						if(!found)
-							found = forenames[word]
-					if(found)
-						if(!(found in mobs_found))
-							mobs_found += found
-							if(!ai_found && isAI(found))
-								ai_found = 1
-							msg += "<b><font color='black'>[original_word] (<A HREF='?_src_=holder;adminmoreinfo=\ref[found]'>?</A>)</font></b> "
-							continue
-			msg += "[original_word] "
+						found = forenames[word]
+				if(found)
+					if(!(found in mobs_found))
+						mobs_found += found
+						if(!ai_found && isAI(found))
+							ai_found = 1
+						msg += "<b><font color='black'>[original_word] (<A HREF='?_src_=holder;adminmoreinfo=\ref[found]'>?</A>)</font></b> "
+						continue
+		msg += "[original_word] "
 
 	if(!mob) //this doesn't happen
 		return

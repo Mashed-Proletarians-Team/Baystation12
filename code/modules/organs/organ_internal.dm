@@ -13,10 +13,6 @@
 	organ_tag = "kidneys"
 	parent_organ = "groin"
 
-/obj/item/organ/kidneys/robotize()
-	. = ..()
-	icon_state = "kidneys-prosthetic"
-
 /obj/item/organ/kidneys/process()
 
 	..()
@@ -41,10 +37,6 @@
 	organ_tag = "eyes"
 	parent_organ = "head"
 	var/list/eye_colour = list(0,0,0)
-
-/obj/item/organ/eyes/robotize()
-	. = ..()
-	icon_state = "eyes-prosthetic"
 
 /obj/item/organ/eyes/proc/update_colour()
 	if(!owner)
@@ -75,10 +67,6 @@
 	icon_state = "liver"
 	organ_tag = "liver"
 	parent_organ = "groin"
-
-/obj/item/organ/liver/robotize()
-	. = ..()
-	icon_state = "liver-prosthetic"
 
 /obj/item/organ/liver/process()
 

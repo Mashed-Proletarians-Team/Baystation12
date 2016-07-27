@@ -27,7 +27,6 @@ var/global/list/additional_antag_types = list()
 	var/round_autoantag = 0                  // Will this round attempt to periodically spawn more antagonists?
 	var/antag_scaling_coeff = 5              // Coefficient for scaling max antagonists to player count.
 	var/require_all_templates = 0            // Will only start if all templates are checked and can spawn.
-	var/addantag_allowed = ADDANTAG_ADMIN | ADDANTAG_AUTO
 
 	var/station_was_nuked = 0                // See nuclearbomb.dm and malfunction.dm.
 	var/explosion_in_progress = 0            // Sit back and relax
@@ -126,7 +125,7 @@ var/global/list/additional_antag_types = list()
 				return
 
 /datum/game_mode/proc/announce() //to be called when round starts
-	world << "<B>The current game mode is [capitalize(name)]!</B>"
+	world << "<B>Текущий игровой режим [capitalize(name)]!</B>"
 	if(round_description) world << "[round_description]"
 	if(round_autoantag) world << "Antagonists will be added to the round automagically as needed."
 	if(antag_templates && antag_templates.len)
@@ -274,14 +273,13 @@ var/global/list/additional_antag_types = list()
 	if(emergency_shuttle.returned() || station_was_nuked)
 		return 1
 	if(end_on_antag_death && antag_templates && antag_templates.len)
-		var/has_antags = 0
 		for(var/datum/antagonist/antag in antag_templates)
 			if(!antag.antags_are_dead())
-				has_antags = 1
-				break
-		if(!has_antags)
+				return 0
+		if(config.continous_rounds)
 			emergency_shuttle.auto_recall = 0
-			return 1
+			return 0
+		return 1
 	return 0
 
 /datum/game_mode/proc/cleanup()	//This is called when the round has ended but not the game, if any cleanup would be necessary in that case.
@@ -304,7 +302,7 @@ var/global/list/additional_antag_types = list()
 		antag.print_player_summary()
 	sleep(2)
 
-	uplink_purchase_repository.print_entries()
+	print_ownerless_uplinks()
 
 	var/clients = 0
 	var/surviving_humans = 0

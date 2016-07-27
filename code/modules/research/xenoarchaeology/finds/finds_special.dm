@@ -10,7 +10,6 @@
 	processing_objects.Add(src)
 	spawning_id = pick("blood","holywater","lube","stoxin","ethanol","ice","glycerol","fuel","cleaner")
 
-
 /obj/item/weapon/reagent_containers/glass/replenishing/process()
 	reagents.add_reagent(spawning_id, 0.3)
 
@@ -24,13 +23,6 @@
 
 /obj/item/clothing/mask/gas/poltergeist/New()
 	processing_objects.Add(src)
-	listening_objects += src
-	..()
-
-/obj/item/clothing/mask/gas/poltergeist/Destroy()
-	processing_objects.Remove(src)
-	listening_objects -= src
-	return ..()
 
 /obj/item/clothing/mask/gas/poltergeist/process()
 	if(heard_talk.len && istype(src.loc, /mob/living) && prob(10))
@@ -65,12 +57,6 @@
 /obj/item/weapon/vampiric/New()
 	..()
 	processing_objects.Add(src)
-	listening_objects += src
-
-/obj/item/weapon/vampiric/Destroy()
-	processing_objects.Remove(src)
-	listening_objects -= src
-	return ..()
 
 /obj/item/weapon/vampiric/process()
 	//see if we've identified anyone nearby
@@ -160,10 +146,6 @@
 	processing_objects.Add(src)
 	loc_last_process = src.loc
 
-/obj/effect/decal/cleanable/blood/splatter/animated/Destroy()
-	processing_objects.Remove(src)
-	return ..()
-
 /obj/effect/decal/cleanable/blood/splatter/animated/process()
 	if(target_turf && src.loc != target_turf)
 		step_towards(src,target_turf)
@@ -193,10 +175,6 @@
 /obj/effect/shadow_wight/New()
 	processing_objects.Add(src)
 
-/obj/effect/shadow_wight/Destroy()
-	processing_objects.Remove(src)
-	return ..()
-
 /obj/effect/shadow_wight/process()
 	if(src.loc)
 		src.loc = get_turf(pick(orange(1,src)))
@@ -222,4 +200,4 @@
 		processing_objects.Remove(src)
 
 /obj/effect/shadow_wight/Bump(var/atom/obstacle)
-	obstacle << "<span class='warning'>You feel a chill run down your spine!</span>"
+	obstacle << "\red You feel a chill run down your spine!"

@@ -1,5 +1,6 @@
 /decl/hierarchy/supply_pack/supply
 	name = "Supply"
+	hierarchy_type = /decl/hierarchy/supply_pack/supply
 
 /decl/hierarchy/supply_pack/supply/food
 	name = "Kitchen supply crate"
@@ -72,7 +73,7 @@
 					/obj/item/clothing/gloves/black,
 					/obj/item/clothing/shoes/black,
 					/obj/item/device/analyzer,
-					/obj/item/weapon/storage/ore,
+					/obj/item/weapon/storage/bag/ore,
 					/obj/item/device/flashlight/lantern,
 					/obj/item/weapon/shovel,
 					/obj/item/weapon/pickaxe,

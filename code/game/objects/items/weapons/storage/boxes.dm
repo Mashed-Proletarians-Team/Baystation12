@@ -27,13 +27,6 @@
 	max_storage_space = DEFAULT_BOX_STORAGE
 	var/foldable = /obj/item/stack/material/cardboard	// BubbleWrap - if set, can be folded (when empty) into a sheet of cardboard
 
-/obj/item/weapon/storage/box/large
-	name = "large box"
-	icon_state = "largebox"
-	w_class = 4
-	max_w_class = 3
-	max_storage_space = DEFAULT_LARGEBOX_STORAGE
-
 // BubbleWrap - A box can be folded up to make card
 /obj/item/weapon/storage/box/attack_self(mob/user as mob)
 	if(..()) return
@@ -55,11 +48,7 @@
 		return
 	// Now make the cardboard
 	user << "<span class='notice'>You fold [src] flat.</span>"
-	if(ispath(foldable, /obj/item/stack))
-		var/stack_amt = max(2**(w_class - 3), 1)
-		new src.foldable(get_turf(src), stack_amt)
-	else
-		new src.foldable(get_turf(src))
+	new src.foldable(get_turf(src))
 	qdel(src)
 
 /obj/item/weapon/storage/box/make_exact_fit()
@@ -377,6 +366,7 @@
 	can_hold = list(/obj/item/organ, /obj/item/weapon/reagent_containers/food, /obj/item/weapon/reagent_containers/glass)
 	max_storage_space = DEFAULT_BACKPACK_STORAGE
 	use_to_pickup = 1 // for picking up broken bulbs, not that most people will try
+
 
 /obj/item/weapon/storage/box/checkers
 	name = "checkers box"

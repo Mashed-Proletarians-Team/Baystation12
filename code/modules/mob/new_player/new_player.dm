@@ -5,7 +5,6 @@
 	var/spawning = 0//Referenced when you want to delete the new_player later on in the code.
 	var/totalPlayers = 0		 //Player counts for the Lobby tab
 	var/totalPlayersReady = 0
-	var/datum/browser/panel
 	universal_speak = 1
 
 	invisibility = 101
@@ -18,23 +17,24 @@
 
 /mob/new_player/New()
 	mob_list += src
-	verbs += /mob/proc/toggle_antag_pool
 
 /mob/new_player/verb/new_player_panel()
 	set src = usr
-	new_player_panel_proc()
-
+	if(!client.banprisoned)
+		new_player_panel_proc()
+	else
+		new_player_panel_prisoner()
 
 /mob/new_player/proc/new_player_panel_proc()
-	var/output = "<div align='center'>"
+	var/output = "<div align='center'><B>New Player Options</B>"
 	output +="<hr>"
 	output += "<p><a href='byond://?src=\ref[src];show_preferences=1'>Setup Character</A></p>"
 
 	if(!ticker || ticker.current_state <= GAME_STATE_PREGAME)
 		if(ready)
-			output += "<p>\[ <span class='linkOn'><b>Ready</b></span> | <a href='byond://?src=\ref[src];ready=0'>Not Ready</a> \]</p>"
+			output += "<p>\[ <b>Ready</b> | <a href='byond://?src=\ref[src];ready=0'>Not Ready</a> \]</p>"
 		else
-			output += "<p>\[ <a href='byond://?src=\ref[src];ready=1'>Ready</a> | <span class='linkOn'><b>Not Ready</b></span> \]</p>"
+			output += "<p>\[ <a href='byond://?src=\ref[src];ready=1'>Ready</a> | <b>Not Ready</b> \]</p>"
 
 	else
 		output += "<a href='byond://?src=\ref[src];manifest=1'>View the Crew Manifest</A><br><br>"
@@ -62,10 +62,7 @@
 
 	output += "</div>"
 
-	panel = new(src, "Welcome","Welcome", 210, 280, src)
-	panel.set_window_options("can_close=0")
-	panel.set_content(output)
-	panel.open()
+	src << browse(output,"window=playersetup;size=210x280;can_close=0")
 	return
 
 /mob/new_player/Stat()
@@ -73,8 +70,6 @@
 
 	if(statpanel("Lobby") && ticker)
 		stat("Game Mode:", PUBLIC_GAME_MODE)
-		var/extra_antags = list2params(additional_antag_types)
-		stat("Added Antagonists:", extra_antags ? extra_antags : "None")
 
 		if(ticker.current_state == GAME_STATE_PREGAME)
 			stat("Time To Start:", "[ticker.pregame_timeleft][round_progressing ? "" : " (DELAYED)"]")
@@ -94,16 +89,23 @@
 		return 1
 
 	if(href_list["ready"])
+		if(client.banprisoned)
+			return
 		if(!ticker || ticker.current_state <= GAME_STATE_PREGAME) // Make sure we don't ready up after the round has started
 			ready = text2num(href_list["ready"])
 		else
 			ready = 0
 
 	if(href_list["refresh"])
-		panel.close()
-		new_player_panel_proc()
+		src << browse(null, "window=playersetup") //closes the player setup window
+		if(!client.banprisoned)
+			new_player_panel_proc()
+		else
+			new_player_panel_prisoner()
 
 	if(href_list["observe"])
+		if(client.banprisoned)
+			return
 
 		if(!config.respawn_delay || alert(src,"Are you sure you wish to observe? You will have to wait [config.respawn_delay] minute\s before being able to respawn!","Player Setup","Yes","No") == "Yes")
 			if(!client)	return 1
@@ -127,7 +129,6 @@
 			var/mob/living/carbon/human/dummy/mannequin = new()
 			client.prefs.dress_preview_mob(mannequin)
 			observer.appearance = mannequin
-			observer.appearance_flags |= KEEP_TOGETHER // replace KEEP_TOGETHER flag so the ghost looks normal-ish
 			observer.alpha = 127
 			observer.layer = initial(observer.layer)
 			observer.invisibility = initial(observer.invisibility)
@@ -144,7 +145,12 @@
 
 			return 1
 
+	if(href_list["spawn_prisoner"])
+		Spawn_Prisoner()
+
 	if(href_list["late_join"])
+		if(client.banprisoned)
+			return
 
 		if(!ticker || ticker.current_state != GAME_STATE_PLAYING)
 			usr << "<span class='warning'>The round is either not ready, or has already finished...</span>"
@@ -152,9 +158,13 @@
 		LateChoices() //show the latejoin job selection menu
 
 	if(href_list["manifest"])
+		if(client.banprisoned)
+			return
 		ViewManifest()
 
 	if(href_list["SelectedJob"])
+		if(client.banprisoned)
+			return
 
 		if(!config.enter_allowed)
 			usr << "<span class='notice'>There is an administrative lock on entering the game!</span>"
@@ -171,6 +181,8 @@
 		return
 
 	if(href_list["privacy_poll"])
+		if(client.banprisoned)
+			return
 		establish_db_connection()
 		if(!dbcon.IsConnected())
 			return
@@ -212,7 +224,10 @@
 		if(client)
 			client.prefs.process_link(src, href_list)
 	else if(!href_list["late_join"])
-		new_player_panel()
+		if(client.banprisoned)
+			new_player_panel_prisoner()
+		else
+			new_player_panel()
 
 	if(href_list["showpoll"])
 
@@ -277,6 +292,14 @@
 	if(!job.player_old_enough(src.client))	return 0
 	return 1
 
+/mob/new_player/proc/IsSpawnSafe(var/turf/T)
+	if(istype(T, /turf/space)) // Space tiles
+		return "Spawn location is open to space."
+	var/datum/gas_mixture/air = T.return_air()
+	if(!air)
+		return "Spawn location lacks atmosphere."
+	return is_safe_atmosphere(air, 1)
+
 /mob/new_player/proc/AttemptLateSpawn(rank,var/spawning_at)
 	if(src != usr)
 		return 0
@@ -289,9 +312,11 @@
 	if(!IsJobAvailable(rank))
 		src << alert("[rank] is not available. Please try another.")
 		return 0
+	if(client && client.banprisoned)
+		return
 
 	var/turf/T = job_master.LateSpawn(client, rank, 1)
-	var/airstatus = IsTurfAtmosUnsafe(T)
+	var/airstatus = IsSpawnSafe(T)
 	if(airstatus)
 		var/reply = alert(usr, "Warning. Your selected spawn location seems to have unfavorable atmospheric conditions. \
 		You may die shortly after spawning. It is possible to select different spawn point via character preferences. \
@@ -345,16 +370,16 @@
 		character.buckled.set_dir(character.dir)
 
 	ticker.mode.handle_latejoin(character)
-	if(job_master.ShouldCreateRecords(rank))
-		if(character.mind.assigned_role != "Cyborg")
-			data_core.manifest_inject(character)
-			ticker.minds += character.mind//Cyborgs and AIs handle this in the transform proc.	//TODO!!!!! ~Carn
 
-			//Grab some data from the character prefs for use in random news procs.
+	if(character.mind.assigned_role != "Cyborg")
+		data_core.manifest_inject(character)
+		ticker.minds += character.mind//Cyborgs and AIs handle this in the transform proc.	//TODO!!!!! ~Carn
 
-			AnnounceArrival(character, rank, join_message)
-		else
-			AnnounceCyborg(character, rank, join_message)
+		//Grab some data from the character prefs for use in random news procs.
+
+		AnnounceArrival(character, rank, join_message)
+	else
+		AnnounceCyborg(character, rank, join_message)
 
 	qdel(src)
 
@@ -447,30 +472,29 @@
 		new_character.dna.SetSEState(GLASSESBLOCK,1,0)
 		new_character.disabilities |= NEARSIGHTED
 
-	// Give them their cortical stack if we're using them.
-	if(config && config.use_cortical_stacks && client && client.prefs.has_cortical_stack /*&& new_character.species.has_organ["brain"]*/)
-		new_character.create_stack()
+	// And uncomment this, too.
+	//new_character.dna.UpdateSE()
 
 	// Do the initial caching of the player's body icons.
 	new_character.force_update_limbs()
 	new_character.update_eyes()
 	new_character.regenerate_icons()
 	new_character.key = key		//Manually transfer the key to log them in
+
 	return new_character
+
 /mob/new_player/proc/ViewManifest()
-	var/dat = "<div align='center'>"
+	var/dat = "<html><body>"
+	dat += "<h4>Show Crew Manifest</h4>"
 	dat += data_core.get_manifest(OOC = 1)
-	//src << browse(dat, "window=manifest;size=370x420;can_close=1")
-	var/datum/browser/popup = new(src, "Crew Manifest", "Crew Manifest", 370, 420, src)
-	popup.set_content(dat)
-	popup.open()
+	src << browse(dat, "window=manifest;size=370x420;can_close=1")
 
 /mob/new_player/Move()
 	return 0
 
 /mob/new_player/proc/close_spawn_windows()
 	src << browse(null, "window=latechoices") //closes late choices window
-	panel.close()
+	src << browse(null, "window=playersetup") //closes the player setup window
 
 /mob/new_player/proc/has_admin_rights()
 	return check_rights(R_ADMIN, 0, src)
@@ -503,17 +527,11 @@
 /mob/new_player/is_ready()
 	return ready && ..()
 
-/mob/new_player/hear_say(var/message, var/verb = "says", var/datum/language/language = null, var/alt_name = "",var/italics = 0, var/mob/speaker = null)
+/mob/new_player/hear_say(var/message, var/verb = "говорит", var/datum/language/language = null, var/alt_name = "",var/italics = 0, var/mob/speaker = null)
 	return
 
-/mob/new_player/hear_radio(var/message, var/verb="says", var/datum/language/language=null, var/part_a, var/part_b, var/part_c, var/mob/speaker = null, var/hard_to_hear = 0)
-	return
-
-/mob/new_player/show_message(msg, type, alt, alt_type)
+/mob/new_player/hear_radio(var/message, var/verb="говорит", var/datum/language/language=null, var/part_a, var/part_b, var/mob/speaker = null, var/hard_to_hear = 0)
 	return
 
 mob/new_player/MayRespawn()
 	return 1
-
-/mob/new_player/touch_map_edge()
-	return

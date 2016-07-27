@@ -41,6 +41,10 @@
 			prisonwarp += loc
 			delete_me = 1
 			return
+		if("ban_prison")
+			ban_prison += loc
+		if("Holding Facility")
+			holdingfacility += loc
 		if("tdome1")
 			tdome1 += loc
 		if("tdome2")

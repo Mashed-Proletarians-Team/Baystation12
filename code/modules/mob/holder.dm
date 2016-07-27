@@ -101,7 +101,13 @@ var/list/holder_mob_icon_cache = list()
 	last_holder = H
 	register_all_movement(H, M)
 
-	update_held_icon()
+	if(istype(H))
+		if(H.l_hand == src)
+			H.update_inv_l_hand()
+		else if(H.r_hand == src)
+			H.update_inv_r_hand()
+		else
+			H.regenerate_icons()
 
 //Mob specific holders.
 /obj/item/weapon/holder/diona

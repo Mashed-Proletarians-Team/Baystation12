@@ -1,6 +1,6 @@
 //This is a holder for things like the Skipjack and Nuke shuttle.
 /datum/shuttle/multi_shuttle
-	flags = SHUTTLE_FLAGS_NONE
+
 	var/cloaked = 1
 	var/at_origin = 1
 	var/returned_home = 0
@@ -22,13 +22,8 @@
 	var/list/destination_dock_targets = list()
 	var/area/origin
 	var/return_warning = 0
-	category = /datum/shuttle/multi_shuttle
 
 /datum/shuttle/multi_shuttle/New()
-	origin = locate(origin)
-	interim = locate(interim)
-	for(var/destination in destinations)
-		destinations[destination] = locate(destinations[destination])
 	..()
 
 /datum/shuttle/multi_shuttle/init_docking_controllers()
@@ -41,7 +36,7 @@
 			var/datum/computer/file/embedded_program/docking/C = locate(controller_tag)
 
 			if(!istype(C))
-				warning("Shuttle with docking tag [controller_tag] could not find it's controller!")
+				world << "<span class='danger'>warning: shuttle with docking tag [controller_tag] could not find it's controller!</span>"
 			else
 				destination_dock_controllers[destination] = C
 

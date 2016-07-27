@@ -60,11 +60,18 @@ datum/preferences
 		//Mob preview
 	var/icon/preview_icon = null
 
+		//Jobs, uses bitflags
+	var/job_civilian_high = 0
+	var/job_civilian_med = 0
+	var/job_civilian_low = 0
 
-	//Since there can only be 1 high job.
-	var/job_high = null
-	var/list/job_medium = list() //List of all things selected for medium weight
-	var/list/job_low    = list() //List of all the things selected for low weight
+	var/job_medsci_high = 0
+	var/job_medsci_med = 0
+	var/job_medsci_low = 0
+
+	var/job_engsec_high = 0
+	var/job_engsec_med = 0
+	var/job_engsec_low = 0
 
 	//Keeps track of preferrence for not getting any wanted jobs
 	var/alternate_option = 0
@@ -102,7 +109,6 @@ datum/preferences
 	var/savefile/loaded_preferences
 	var/savefile/loaded_character
 	var/datum/category_collection/player_setup_collection/player_setup
-	var/datum/browser/panel
 
 /datum/preferences/New(client/C)
 	player_setup = new(src)
@@ -208,9 +214,9 @@ datum/preferences
 	popup.open()
 
 /datum/preferences/proc/process_link(mob/user, list/href_list)
-
 	if(!user)	return
-	if(isliving(user)) return
+
+	if(!istype(user, /mob/new_player))	return
 
 	if(href_list["preference"] == "open_whitelist_forum")
 		if(config.forumurl)
@@ -369,8 +375,7 @@ datum/preferences
 	character.used_skillpoints = used_skillpoints
 
 /datum/preferences/proc/open_load_dialog(mob/user)
-	var/dat  = list()
-	dat += "<body>"
+	var/dat = "<body>"
 	dat += "<tt><center>"
 
 	var/savefile/S = new /savefile(path)
@@ -387,10 +392,7 @@ datum/preferences
 
 	dat += "<hr>"
 	dat += "</center></tt>"
-	panel = new(user, "Character Slots", "Character Slots", 300, 390, src)
-	panel.set_content(jointext(dat,null))
-	panel.open()
+	user << browse(dat, "window=saves;size=300x390")
 
 /datum/preferences/proc/close_load_dialog(mob/user)
 	user << browse(null, "window=saves")
-	panel.close()

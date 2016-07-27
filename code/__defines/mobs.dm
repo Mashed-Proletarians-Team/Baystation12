@@ -12,7 +12,7 @@
 #define PASSEMOTES  0x32    // Mob has a cortical borer or holders inside of it that need to see emotes.
 #define GODMODE     0x1000
 #define FAKEDEATH   0x2000  // Replaces stuff like changeling.changeling_fakedeath.
-#define NO_ANTAG    0x4000  // Players are restricted from gaining antag roles when occupying this mob
+#define DISFIGURED  0x4000  // Set but never checked. Remove this sometime and replace occurences with the appropriate organ code
 #define XENO_HOST   0x8000  // Tracks whether we're gonna be a baby alien's mummy.
 
 // Grab levels.
@@ -108,10 +108,6 @@
 #define COMPANY_OPPOSED			"Opposed"
 
 #define COMPANY_ALIGNMENTS		list(COMPANY_LOYAL,COMPANY_SUPPORTATIVE,COMPANY_NEUTRAL,COMPANY_SKEPTICAL,COMPANY_OPPOSED)
-
-// Defines the argument used for get_mobs_and_objs_in_view_fast
-#define GHOSTS_ALL_HEAR 1
-#define ONLY_GHOSTS_IN_VIEW 0
 
 
 // Defines mob sizes, used by lockers and to determine what is considered a small sized mob, etc.

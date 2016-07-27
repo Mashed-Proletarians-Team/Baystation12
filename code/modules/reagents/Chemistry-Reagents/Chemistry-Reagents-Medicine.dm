@@ -10,7 +10,6 @@
 	overdose = REAGENTS_OVERDOSE * 2
 	metabolism = REM * 0.5
 	scannable = 1
-	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/inaprovaline/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	if(alien != IS_DIONA)
@@ -28,7 +27,6 @@
 	color = "#BF0000"
 	overdose = REAGENTS_OVERDOSE
 	scannable = 1
-	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/bicaridine/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	if(alien != IS_DIONA)
@@ -43,7 +41,6 @@
 	color = "#FFA800"
 	overdose = REAGENTS_OVERDOSE
 	scannable = 1
-	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/kelotane/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	if(alien != IS_DIONA)
@@ -59,7 +56,6 @@
 	color = "#FF8000"
 	overdose = REAGENTS_OVERDOSE * 0.5
 	scannable = 1
-	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/dermaline/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	if(alien != IS_DIONA)
@@ -73,7 +69,6 @@
 	reagent_state = LIQUID
 	color = "#00A000"
 	scannable = 1
-	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/dylovene/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	if(alien != IS_DIONA)
@@ -90,7 +85,6 @@
 	color = "#0080FF"
 	overdose = REAGENTS_OVERDOSE
 	scannable = 1
-	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/dexalin/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	if(alien == IS_VOX)
@@ -109,7 +103,6 @@
 	color = "#0040FF"
 	overdose = REAGENTS_OVERDOSE * 0.5
 	scannable = 1
-	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/dexalinp/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	if(alien == IS_VOX)
@@ -127,7 +120,6 @@
 	reagent_state = LIQUID
 	color = "#8040FF"
 	scannable = 1
-	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/tricordrazine/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	if(alien != IS_DIONA)
@@ -144,7 +136,6 @@
 	color = "#8080FF"
 	metabolism = REM * 0.5
 	scannable = 1
-	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/cryoxadone/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	if(M.bodytemperature < 170)
@@ -163,7 +154,6 @@
 	color = "#80BFFF"
 	metabolism = REM * 0.5
 	scannable = 1
-	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/clonexadone/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	if(M.bodytemperature < 170)
@@ -185,7 +175,6 @@
 	overdose = 60
 	scannable = 1
 	metabolism = 0.02
-	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/paracetamol/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	M.add_chemical_effect(CE_PAINKILLER, 50)
@@ -204,7 +193,6 @@
 	overdose = 30
 	scannable = 1
 	metabolism = 0.02
-	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/tramadol/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	M.add_chemical_effect(CE_PAINKILLER, 80)
@@ -222,7 +210,6 @@
 	color = "#800080"
 	overdose = 20
 	metabolism = 0.02
-	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/oxycodone/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	M.add_chemical_effect(CE_PAINKILLER, 200)
@@ -267,7 +254,6 @@
 	metabolism = REM * 0.25
 	overdose = REAGENTS_OVERDOSE
 	scannable = 1
-	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/alkysine/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	if(alien == IS_DIONA)
@@ -284,8 +270,6 @@
 	color = "#C8A5DC"
 	overdose = REAGENTS_OVERDOSE
 	scannable = 1
-	flags = IGNORE_MOB_SIZE
-
 
 /datum/reagent/imidazoline/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	M.eye_blurry = max(M.eye_blurry - 5, 0)
@@ -306,7 +290,6 @@
 	color = "#561EC3"
 	overdose = 10
 	scannable = 1
-	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/peridaxon/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	if(ishuman(M))
@@ -385,7 +368,6 @@
 	metabolism = REM * 0.25
 	overdose = REAGENTS_OVERDOSE
 	scannable = 1
-	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/hyronalin/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	M.radiation = max(M.radiation - 30 * removed, 0)
@@ -399,7 +381,6 @@
 	metabolism = REM * 0.25
 	overdose = REAGENTS_OVERDOSE
 	scannable = 1
-	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/arithrazine/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	M.radiation = max(M.radiation - 70 * removed, 0)
@@ -529,7 +510,7 @@
 			else
 				M << "<span class='warning'>Your mind breaks apart...</span>"
 				M.hallucination += 200
-
+				
 /datum/reagent/nicotine
 	name = "Nicotine"
 	id = "nicotine"
@@ -539,7 +520,7 @@
 	color = "#181818"
 	metabolism = REM * 0.002
 	overdose = REAGENTS_OVERDOSE * 0.5
-	scannable = 1
+	scannable = 1	
 	data = 0
 
 /datum/reagent/nicotine/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
@@ -552,26 +533,7 @@
 	else
 		if(world.time > data + ANTIDEPRESSANT_MESSAGE_DELAY * 0.3)
 			data = world.time
-			M << "<span class='notice'>You feel invigorated and calm.</span>"
-
-/datum/reagent/menthol
-	name = "Menthol"
-	id = "menthol"
-	description = "Tastes naturally minty, and imparts a very mild numbing sensation."
-	taste_description = "mint"
-	reagent_state = LIQUID
-	color = "#80AF9C"
-	metabolism = REM * 0.002
-	overdose = REAGENTS_OVERDOSE * 0.25
-	scannable = 1
-	data = 0
-
-/datum/reagent/menthol/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
-	if(alien == IS_DIONA)
-		return
-	if(world.time > data + ANTIDEPRESSANT_MESSAGE_DELAY * 0.35)
-		data = world.time
-		M << "<span class='notice'>You feel faintly sore in the throat.</span>"
+			M << "<span class='notice'>You feel invigorated and calm.</span>"					
 
 /datum/reagent/rezadone
 	name = "Rezadone"
@@ -582,17 +544,14 @@
 	color = "#669900"
 	overdose = REAGENTS_OVERDOSE
 	scannable = 1
-	flags = IGNORE_MOB_SIZE
 
 /datum/reagent/rezadone/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	M.adjustCloneLoss(-20 * removed)
 	M.adjustOxyLoss(-2 * removed)
 	M.heal_organ_damage(20 * removed, 20 * removed)
 	M.adjustToxLoss(-20 * removed)
-	if(dose > 3 && ishuman(M))
-		var/mob/living/carbon/human/H = M
-		for(var/obj/item/organ/external/E in H.organs)
-			E.disfigured = 1 //currently only matters for the head, but might as well disfigure them all.
+	if(dose > 3)
+		M.status_flags &= ~DISFIGURED
 	if(dose > 10)
 		M.make_dizzy(5)
 		M.make_jittery(5)

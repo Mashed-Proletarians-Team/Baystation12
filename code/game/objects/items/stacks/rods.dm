@@ -4,14 +4,13 @@
 	singular_name = "metal rod"
 	icon_state = "rods"
 	flags = CONDUCT
-	w_class = 4
+	w_class = 3.0
 	force = 9.0
 	throwforce = 15.0
 	throw_speed = 5
 	throw_range = 20
 	matter = list(DEFAULT_WALL_MATERIAL = 1875)
-	max_amount = 100
-	center_of_mass = null
+	max_amount = 60
 	attack_verb = list("hit", "bludgeoned", "whacked")
 	lock_picking_level = 3
 
@@ -23,10 +22,6 @@
 	uses_charge = 1
 	charge_costs = list(500)
 	stacktype = /obj/item/stack/rods
-
-/obj/item/stack/rods/New()
-	..()
-	update_icon()
 
 /obj/item/stack/rods/attackby(obj/item/W as obj, mob/user as mob)
 	..()
@@ -83,19 +78,3 @@
 		F.add_fingerprint(usr)
 		use(2)
 	return
-
-/obj/item/stack/rods/update_icon()
-	if(amount == 1)
-		icon = 'icons/obj/weapons.dmi'
-		icon_state = "metal-rod"
-	else
-		icon = initial(icon)
-		icon_state = initial(icon_state)
-
-/obj/item/stack/rods/use()
-	. = ..()
-	update_icon()
-
-/obj/item/stack/rods/add()
-	. = ..()
-	update_icon()

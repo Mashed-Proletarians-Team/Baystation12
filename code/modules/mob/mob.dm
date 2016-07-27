@@ -1,10 +1,9 @@
 /mob/Destroy()//This makes sure that mobs with clients/keys are not just deleted from the game.
 	mob_list -= src
-	dead_mob_list_ -= src
-	living_mob_list_ -= src
+	dead_mob_list -= src
+	living_mob_list -= src
 	unset_machine()
 	qdel(hud_used)
-	clear_fullscreen()
 	if(client)
 		for(var/obj/screen/movable/spell_master/spell_master in spell_masters)
 			qdel(spell_master)
@@ -15,9 +14,11 @@
 	if(mind && mind.current == src)
 		spellremove(src)
 	ghostize()
-	. = ..()
+	..()
 
 /mob/proc/remove_screen_obj_references()
+	flash = null
+	blind = null
 	hands = null
 	pullin = null
 	purged = null
@@ -32,6 +33,7 @@
 	throw_icon = null
 	nutrition_icon = null
 	pressure = null
+	damageoverlay = null
 	pain = null
 	item_use_icon = null
 	gun_move_icon = null
@@ -41,6 +43,10 @@
 
 /mob/New()
 	mob_list += src
+	if(stat == DEAD)
+		dead_mob_list += src
+	else
+		living_mob_list += src
 	..()
 
 /mob/proc/show_message(msg, type, alt, alt_type)//Message, type of message (1 or 2), alternative message, alt message type (1 or 2)
@@ -111,26 +117,21 @@
 	var/range = world.view
 	if(hearing_distance)
 		range = hearing_distance
+	var/list/hear = get_mobs_or_objects_in_view(range,src)
 
-	var/turf/T = get_turf(src)
+	for(var/I in hear)
+		if(isobj(I))
+			spawn(0)
+				if(I) //It's possible that it could be deleted in the meantime.
+					var/obj/O = I
+					O.show_message( message, 2, deaf_message, 1)
+		else if(ismob(I))
+			var/mob/M = I
+			var/msg = message
+			if(self_message && M==src)
+				msg = self_message
+			M.show_message( msg, 2, deaf_message, 1)
 
-	var/list/mobs = list()
-	var/list/objs = list()
-	get_mobs_and_objs_in_view_fast(T, range, mobs, objs)
-
-
-	for(var/m in mobs)
-		var/mob/M = m
-		if(self_message && M==src)
-			M.show_message(self_message,2,deaf_message,1)
-			continue
-
-		M.show_message(message,2,deaf_message,1)
-
-
-	for(var/o in objs)
-		var/obj/O = o
-		O.show_message(message,2,deaf_message,1)
 
 /mob/proc/findname(msg)
 	for(var/mob/M in mob_list)
@@ -227,7 +228,7 @@
 	set category = "IC"
 
 	if((is_blind(src) || usr.stat) && !isobserver(src))
-		src << "<span class='notice'>Something is there but you can't see it.</span>"
+		src << "<span class='notice'>Похоже, тут что-то есть, но вы не можете этого увидеть.</span>"
 		return 1
 
 	face_atom(A)
@@ -387,28 +388,28 @@
 	set category = "OOC"
 
 	if (!( config.abandon_allowed ))
-		usr << "<span class='notice'>Respawn is disabled.</span>"
+		usr << "<span class='notice'>Респаун выключен.</span>"
 		return
 	if ((stat != DEAD || !( ticker )))
-		usr << "<span class='notice'><B>You must be dead to use this!</B></span>"
+		usr << "<span class='notice'><B>Вы должны быть мертвы чтобы использовать эту возможность!</B></span>"
 		return
 	if (ticker.mode && ticker.mode.deny_respawn)
-		usr << "<span class='notice'>Respawn is disabled for this roundtype.</span>"
+		usr << "<span class='notice'>Респаун отключён для этого раунда.</span>"
 		return
 	else if(!MayRespawn(1, config.respawn_delay))
 		return
 
-	usr << "You can respawn now, enjoy your new life!"
+	usr << "Вам было выдано разрешение на респаун, наслаждайтесь новой жизнью!"
 
 	log_game("[usr.name]/[usr.key] used abandon mob.")
 
-	usr << "<span class='notice'><B>Make sure to play a different character, and please roleplay correctly!</B></span>"
+	usr << "<span class='notice'><B>Убедитесь в том, что вы будете играть другим персонажем, и пожалуйста, отыгрывайте правильно!</B></span>"
 
 	if(!client)
 		log_game("[usr.key] AM failed due to disconnect.")
 		return
 	client.screen.Cut()
-	add_click_catcher()
+	client.screen += client.void
 	if(!client)
 		log_game("[usr.key] AM failed due to disconnect.")
 		return
@@ -566,7 +567,7 @@
 			for(var/name in H.organs_by_name)
 				var/obj/item/organ/external/e = H.organs_by_name[name]
 				if(e && H.lying)
-					if((((e.status & ORGAN_BROKEN) && !e.splinted) || e.status & ORGAN_BLEEDING ) && (H.getBruteLoss() + H.getFireLoss() >= 100))
+					if(((e.status & ORGAN_BROKEN && !(e.status & ORGAN_SPLINTED)) || e.status & ORGAN_BLEEDING) && (H.getBruteLoss() + H.getFireLoss() >= 100))
 						return 1
 						break
 		return 0
@@ -691,7 +692,11 @@
 		if(statpanel("Status") && ticker && ticker.current_state != GAME_STATE_PREGAME)
 			stat("Station Time", stationtime2text())
 			stat("Round Duration", roundduration2text())
-
+			if(currentbuild)
+				stat("Build:", currentbuild.friendlyname)
+			if (nextbuild && istype(nextbuild))
+				stat("Next Build:", nextbuild.friendlyname)
+			stat("Server Time", time2text(world.realtime, "YYYY-MM-DD hh:mm"))
 		if(client.holder)
 			if(statpanel("Status"))
 				stat("Location:", "([x], [y], [z]) [loc]")
@@ -734,20 +739,33 @@
 	if(!resting && cannot_stand() && can_stand_overridden())
 		lying = 0
 		canmove = 1
-	else if(buckled)
-		anchored = 1
-		canmove = 0
-		if(istype(buckled))
-			if(buckled.buckle_lying == -1)
-				lying = incapacitated(INCAPACITATION_KNOCKDOWN)
-			else
-				lying = buckled.buckle_lying
-			if(buckled.buckle_movable)
-				anchored = 0
-				canmove = 1
 	else
-		lying = incapacitated(INCAPACITATION_KNOCKDOWN)
-		canmove = !incapacitated(INCAPACITATION_DISABLED)
+		if(istype(buckled, /obj/vehicle))
+			var/obj/vehicle/V = buckled
+			if(is_physically_disabled())
+				lying = 1
+				canmove = 0
+				pixel_y = V.mob_offset_y - 5
+			else
+				if(buckled.buckle_lying != -1) lying = buckled.buckle_lying
+				canmove = 1
+				pixel_y = V.mob_offset_y
+		else if(buckled)
+			anchored = 1
+			canmove = 0
+			if(istype(buckled))
+				if(buckled.buckle_lying != -1)
+					lying = buckled.buckle_lying
+				if(buckled.buckle_movable)
+					anchored = 0
+					canmove = 1
+		else if(captured)
+			anchored = 1
+			canmove = 0
+			lying = 0
+		else
+			lying = incapacitated(INCAPACITATION_KNOCKDOWN)
+			canmove = !incapacitated(INCAPACITATION_DISABLED)
 
 	if(lying)
 		density = 0
@@ -1078,20 +1096,3 @@ mob/proc/yank_out_object()
 	src.in_throw_mode = 1
 	if(src.throw_icon)
 		src.throw_icon.icon_state = "act_throw_on"
-
-/mob/proc/toggle_antag_pool()
-	set name = "Toggle Add-Antag Candidacy"
-	set desc = "Toggles whether or not you will be considered a candidate by an add-antag vote."
-	set category = "OOC"
-	if(isghostmind(src.mind) || isnewplayer(src))
-		if(ticker && ticker.looking_for_antags)
-			if(src.mind in ticker.antag_pool)
-				ticker.antag_pool -= src.mind
-				usr << "You have left the antag pool."
-			else
-				ticker.antag_pool += src.mind
-				usr << "You have joined the antag pool. Make sure you have the needed role set to high!"
-		else
-			usr << "The game is not currently looking for antags."
-	else
-		usr << "You must be observing or in the lobby to join the antag pool."

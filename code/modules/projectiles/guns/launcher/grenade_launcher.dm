@@ -15,13 +15,6 @@
 	var/obj/item/weapon/grenade/chambered
 	var/list/grenades = new/list()
 	var/max_grenades = 5 //holds this + one in the chamber
-	var/whitelisted_grenades = list(
-		/obj/item/weapon/grenade/frag/shell)
-
-	var/blacklisted_grenades = list(
-		/obj/item/weapon/grenade/flashbang/clusterbang,
-		/obj/item/weapon/grenade/frag)
-
 	matter = list(DEFAULT_WALL_MATERIAL = 2000)
 
 //revolves the magazine, allowing players to choose between multiple grenade types
@@ -50,7 +43,8 @@
 			user << "\A [chambered] is chambered."
 
 /obj/item/weapon/gun/launcher/grenade/proc/load(obj/item/weapon/grenade/G, mob/user)
-	if(!can_load_grenade_type(G, user))
+	if(!G.loadable)
+		user << "<span class='warning'>\The [G] doesn't seem to fit in \the [src]!</span>"
 		return
 
 	if(grenades.len >= max_grenades)
@@ -96,12 +90,6 @@
 	chambered = null
 	..()
 
-/obj/item/weapon/gun/launcher/grenade/proc/can_load_grenade_type(obj/item/weapon/grenade/G, mob/user)
-	if(is_type_in_list(G, blacklisted_grenades) && ! is_type_in_list(G, whitelisted_grenades))
-		user << "<span class='warning'>\The [G] doesn't seem to fit in \the [src]!</span>"
-		return FALSE
-	return TRUE
-
 // For uplink purchase, comes loaded with a random assortment of grenades
 /obj/item/weapon/gun/launcher/grenade/loaded/New()
 	..()
@@ -134,7 +122,8 @@
 
 //load and unload directly into chambered
 /obj/item/weapon/gun/launcher/grenade/underslung/load(obj/item/weapon/grenade/G, mob/user)
-	if(!can_load_grenade_type(G, user))
+	if(!G.loadable)
+		user << "<span class='warning'>[G] doesn't seem to fit in the [src]!</span>"
 		return
 
 	if(chambered)

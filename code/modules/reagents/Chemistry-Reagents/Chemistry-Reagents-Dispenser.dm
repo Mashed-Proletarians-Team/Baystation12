@@ -113,10 +113,12 @@
 		L.adjust_fire_stacks(amount / 15)
 
 /datum/reagent/ethanol/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
+	if(issmall(M)) removed *= 2
 	M.adjustToxLoss(removed * 2 * toxicity)
 	return
 
 /datum/reagent/ethanol/affect_ingest(var/mob/living/carbon/M, var/alien, var/removed)
+	if(issmall(M)) removed *= 2
 	M.nutrition += nutriment_factor * removed
 	var/strength_mod = 1
 	if(alien == IS_SKRELL)
@@ -260,6 +262,7 @@
 	color = "#C7C7C7"
 
 /datum/reagent/radium/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
+	if(issmall(M)) removed *= 2
 	M.apply_effect(10 * removed, IRRADIATE, blocked = 0) // Radium may increase your chances to cure a disease
 	if(M.virus2.len)
 		for(var/ID in M.virus2)
@@ -296,6 +299,7 @@
 	var/meltdose = 10 // How much is needed to melt
 
 /datum/reagent/acid/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
+	if(issmall(M)) removed *= 2
 	M.take_organ_damage(0, removed * power * 2)
 
 /datum/reagent/acid/affect_touch(var/mob/living/carbon/M, var/alien, var/removed) // This is the most interesting
@@ -341,19 +345,22 @@
 		if(removed <= 0)
 			return
 
-	if(M.unacidable)
-		return
-
 	if(volume < meltdose) // Not enough to melt anything
-		M.take_organ_damage(0, removed * power * 0.1) //burn damage, since it causes chemical burns. Acid doesn't make bones shatter, like brute trauma would.
-	else
-		M.take_organ_damage(0, removed * power * 0.2)
-		if(removed && ishuman(M) && prob(100 * removed / meltdose)) // Applies disfigurement
+		M.take_organ_damage(0, removed * power * 0.2) //burn damage, since it causes chemical burns. Acid doesn't make bones shatter, like brute trauma would.
+		return
+	if(!M.unacidable && removed > 0)
+		if(istype(M, /mob/living/carbon/human) && volume >= meltdose)
 			var/mob/living/carbon/human/H = M
-			if(!(H.species && (H.species.flags & NO_PAIN))) //TODO proc for whether someone can feel pain
-				H.emote("scream")
-			for(var/obj/item/organ/external/affecting in H.organs)
-				affecting.disfigured = 1
+			var/obj/item/organ/external/affecting = H.get_organ("head")
+			if(affecting)
+				if(affecting.take_damage(0, removed * power * 0.1))
+					H.UpdateDamageIcon()
+				if(prob(100 * removed / meltdose)) // Applies disfigurement
+					if (!(H.species && (H.species.flags & NO_PAIN)))
+						H.emote("scream")
+					H.status_flags |= DISFIGURED
+		else
+			M.take_organ_damage(0, removed * power * 0.1) // Balance. The damage is instant, so it's weaker. 10 units -> 5 damage, double for pacid. 120 units beaker could deal 60, but a) it's burn, which is not as dangerous, b) it's a one-use weapon, c) missing with it will splash it over the ground and d) clothes give some protection, so not everything will hit
 
 /datum/reagent/acid/touch_obj(var/obj/O)
 	if(O.unacidable)
@@ -407,13 +414,17 @@
 /datum/reagent/sugar/affect_blood(var/mob/living/carbon/M, var/alien, var/removed)
 	M.nutrition += removed * 3
 
+	var/effective_dose = dose
+	if(issmall(M))
+		effective_dose *= 2
+
 	if(alien == IS_UNATHI)
-		if(dose < 2)
-			if(dose == metabolism * 2 || prob(5))
+		if(effective_dose < 2)
+			if(effective_dose == metabolism * 2 || prob(5))
 				M.emote("yawn")
-		else if(dose < 5)
+		else if(effective_dose < 5)
 			M.eye_blurry = max(M.eye_blurry, 10)
-		else if(dose < 20)
+		else if(effective_dose < 20)
 			if(prob(50))
 				M.Weaken(2)
 			M.drowsyness = max(M.drowsyness, 20)

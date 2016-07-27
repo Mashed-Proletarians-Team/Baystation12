@@ -26,11 +26,10 @@
 	icon_state = "nucgun"
 	origin_tech = list(TECH_COMBAT = 3, TECH_MATERIAL = 5, TECH_POWER = 3)
 	slot_flags = SLOT_BELT
-	w_class = 4
 	force = 8 //looks heavier than a pistol
 	self_recharge = 1
 	modifystate = null
-	requires_two_hands = 1 //bulkier than an e-gun, but not quite the size of a carbine
+	requires_two_hands = 1 //bulkier than an e-gun
 	
 	firemodes = list(
 		list(mode_name="stun", projectile_type=/obj/item/projectile/beam/stun),

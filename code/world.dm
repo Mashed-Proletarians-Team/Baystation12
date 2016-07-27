@@ -46,9 +46,7 @@
 		config.server_name += " #[(world.port % 1000) / 100]"
 
 	if(config && config.log_runtime)
-		var/runtime_log = file("data/logs/runtime/[date_string]-[game_id].log")
-		runtime_log << "Game [game_id] starting up at [time2text(world.timeofday, "hh:mm.ss")]"
-		log = runtime_log
+		log = file("data/logs/runtime/[time2text(world.realtime,"YYYY-MM-DD-(hh-mm-ss)")]-runtime.log")
 
 	callHook("startup")
 	//Emergency Fix
@@ -184,16 +182,34 @@ var/world_topic_spam_protect_time = world.timeofday
 		return list2params(s)
 
 	else if(T == "manifest")
-		data_core.get_manifest_list()
 		var/list/positions = list()
+		var/list/set_names = list(
+				"heads" = command_positions,
+				"sec" = security_positions,
+				"eng" = engineering_positions,
+				"med" = medical_positions,
+				"sci" = science_positions,
+				"car" = cargo_positions,
+				"civ" = civilian_positions,
+				"bot" = nonhuman_positions
+			)
 
-		// We rebuild the list in the format external tools expect
-		for(var/dept in PDA_Manifest)
-			var/list/dept_list = PDA_Manifest[dept]
-			if(dept_list.len > 0)
-				positions[dept] = list()
-				for(var/list/person in dept_list)
-					positions[dept][person["name"]] = person["rank"]
+		for(var/datum/data/record/t in data_core.general)
+			var/name = t.fields["name"]
+			var/rank = t.fields["rank"]
+			var/real_rank = make_list_rank(t.fields["real_rank"])
+
+			var/department = 0
+			for(var/k in set_names)
+				if(real_rank in set_names[k])
+					if(!positions[k])
+						positions[k] = list()
+					positions[k][name] = rank
+					department = 1
+			if(!department)
+				if(!positions["misc"])
+					positions["misc"] = list()
+				positions["misc"][name] = rank
 
 		for(var/k in positions)
 			positions[k] = list2params(positions[k]) // converts positions["heads"] = list("Bob"="Captain", "Bill"="CMO") into positions["heads"] = "Bob=Captain&Bill=CMO"
@@ -201,19 +217,10 @@ var/world_topic_spam_protect_time = world.timeofday
 		return list2params(positions)
 
 	else if(T == "revision")
-		var/list/L = list()
-		L["gameid"] = game_id
-		L["dm_version"] = DM_VERSION // DreamMaker version compiled in
-		L["dd_version"] = world.byond_version // DreamDaemon version running on
-		
 		if(revdata.revision)
-			L["revision"] = revdata.revision
-			L["branch"] = revdata.branch
-			L["date"] = revdata.date
+			return list2params(list(branch = revdata.branch, date = revdata.date, revision = revdata.revision))
 		else
-			L["revision"] = "unknown"
-		
-		return list2params(L)
+			return "unknown"
 
 	else if(copytext(T,1,5) == "info")
 		var/input[] = params2list(T)
@@ -363,19 +370,7 @@ var/world_topic_spam_protect_time = world.timeofday
 				1. notes = ckey of person the notes lookup is for
 				2. validationkey = the key the bot has, it should match the gameservers commspassword in it's configuration.
 		*/
-		var/input[] = params2list(T)
-		if(input["key"] != config.comms_password)
-			if(world_topic_spam_protect_ip == addr && abs(world_topic_spam_protect_time - world.time) < 50)
-
-				spawn(50)
-					world_topic_spam_protect_time = world.time
-					return "Bad Key (Throttled)"
-
-			world_topic_spam_protect_time = world.time
-			world_topic_spam_protect_ip = addr
-			return "Bad Key"
-
-		return show_player_info_irc(ckey(input["notes"]))
+		return //but we don't have irc
 
 	else if(copytext(T,1,4) == "age")
 		var/input[] = params2list(T)
@@ -443,6 +438,7 @@ var/world_topic_spam_protect_time = world.timeofday
 
 /world/proc/load_motd()
 	join_motd = file2text("config/motd.txt")
+	join_motd = sanitize_a0(join_motd)
 
 
 /proc/load_configuration()
@@ -451,6 +447,7 @@ var/world_topic_spam_protect_time = world.timeofday
 	config.load("config/game_options.txt","game_options")
 	config.loadsql("config/dbconfig.txt")
 	config.loadforumsql("config/forumdbconfig.txt")
+	config.loadbuildlist("config/builds.txt")
 
 /hook/startup/proc/loadMods()
 	world.load_mods()
@@ -503,16 +500,21 @@ var/world_topic_spam_protect_time = world.timeofday
 
 	if (config && config.server_name)
 		s += "<b>[config.server_name]</b> &#8212; "
+	else
+		s += "<b>[world.name]</b> &#8212; "
 
 	s += "<b>[station_name()]</b>";
 	s += " ("
-	s += "<a href=\"http://\">" //Change this to wherever you want the hub to link to.
+	s += "<a href=\"http://http://infinity.smforum.ru/\">" //Change this to wherever you want the hub to link to.
 //	s += "[game_version]"
-	s += "Default"  //Replace this with something else. Or ever better, delete it and uncomment the game version.
+	s += "Forum"  //Replace this with something else. Or ever better, delete it and uncomment the game version.
 	s += "</a>"
 	s += ")"
 
 	var/list/features = list()
+
+	if(currentbuild)
+		features += "[currentbuild.friendlyname]"
 
 	if(ticker)
 		if(master_mode)

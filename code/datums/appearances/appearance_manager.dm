@@ -27,8 +27,7 @@ var/decl/appearance_manager/appearance_manager = new()
 /decl/appearance_manager/proc/remove_appearance(var/mob/viewer, var/datum/appearance_data/ad, var/refresh_images)
 	var/PriorityQueue/pq = appearances_[viewer]
 	pq.Remove(ad)
-	if(viewer.client)
-		viewer.client.images -= ad.images
+	viewer.client.images -= ad.images
 	if(!pq.Length())
 		logged_in_event.unregister(viewer, src, /decl/appearance_manager/proc/apply_appearance_images)
 		destroyed_event.register(viewer, src, /decl/appearance_manager/proc/remove_appearances)

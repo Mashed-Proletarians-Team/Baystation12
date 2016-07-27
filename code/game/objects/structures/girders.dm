@@ -65,7 +65,7 @@
 		else if(!anchored)
 			playsound(src.loc, 'sound/items/Ratchet.ogg', 100, 1)
 			user << "<span class='notice'>Now securing the girder...</span>"
-			if(do_after(user, 40,src))
+			if(get_turf(user, 40))
 				user << "<span class='notice'>You secured the girder!</span>"
 				reset_girder()
 
@@ -186,7 +186,7 @@
 	return 1
 
 /obj/structure/girder/proc/reinforce_girder()
-	cover = 75
+	cover = reinf_material.hardness
 	health = 500
 	state = 2
 	icon_state = "reinforced"

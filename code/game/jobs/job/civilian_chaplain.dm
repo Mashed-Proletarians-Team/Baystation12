@@ -1,28 +1,29 @@
 //Due to how large this one is it gets its own file
 /datum/job/chaplain
 	title = "Chaplain"
+	flag = CHAPLAIN
 	department = "Civilian"
-	department_flag = CIV
+	department_flag = CIVILIAN
 	faction = "Station"
 	total_positions = 1
 	spawn_positions = 1
 	supervisors = "the head of personnel"
-	selection_color = "#515151"
+	selection_color = "#dddddd"
 	access = list(access_morgue, access_chapel_office, access_crematorium, access_maint_tunnels)
 	minimal_access = list(access_morgue, access_chapel_office, access_crematorium)
 	alt_titles = list("Counselor")
-	outfit_type = /decl/hierarchy/outfit/job/chaplain
+
 
 	equip(var/mob/living/carbon/human/H, var/alt_title, var/ask_questions = TRUE)
-		. = ..()
-		if(!.)
-			return
-		if(!ask_questions)
-			return
+		if(!H)	return 0
 
-		var/obj/item/weapon/storage/bible/B = locate(/obj/item/weapon/storage/bible) in H
-		if(!B)
-			return
+		var/obj/item/weapon/storage/bible/B = new /obj/item/weapon/storage/bible(H) //BS12 EDIT
+		H.equip_to_slot_or_del(B, slot_l_hand)
+		H.equip_to_slot_or_del(new /obj/item/clothing/under/rank/chaplain(H), slot_w_uniform)
+		H.equip_to_slot_or_del(new /obj/item/device/pda/chaplain(H), slot_belt)
+		H.equip_to_slot_or_del(new /obj/item/clothing/shoes/black(H), slot_shoes)
+		if(!ask_questions)
+			return 1
 
 		spawn(0)
 			var/religion_name = "Christianity"
@@ -30,6 +31,7 @@
 
 			if (!new_religion)
 				new_religion = religion_name
+
 			switch(lowertext(new_religion))
 				if("christianity")
 					B.name = pick("The Holy Bible","The Dead Sea Scrolls")
@@ -151,3 +153,6 @@
 			feedback_set_details("religion_deity","[new_deity]")
 			feedback_set_details("religion_book","[new_book_style]")
 		return 1
+
+/datum/job/chaplain/equip_preview(var/mob/living/carbon/human/H, var/alt_title)
+	return equip(H, alt_title, FALSE)

@@ -525,7 +525,7 @@ other types of metals and chemistry for reagents).
 	id = "ammo_9mm"
 	req_tech = list(TECH_COMBAT = 4, TECH_MATERIAL = 3)
 	materials = list(DEFAULT_WALL_MATERIAL = 3750, "silver" = 100)
-	build_path = /obj/item/ammo_magazine/box/c9mm
+	build_path = /obj/item/ammo_magazine/c9mm
 	sort_string = "TAACA"
 
 /datum/design/item/weapon/stunshell
@@ -868,6 +868,7 @@ other types of metals and chemistry for reagents).
 	req_tech = list(TECH_POWER = 1, TECH_ENGINEERING = 1)
 	build_type = PROTOLATHE
 	materials = list(DEFAULT_WALL_MATERIAL = 400)
+	chemicals = list("sacid" = 10)
 	build_path = /obj/item/weapon/computer_hardware/battery_module
 	sort_string = "VBAAP"
 
@@ -877,6 +878,7 @@ other types of metals and chemistry for reagents).
 	req_tech = list(TECH_POWER = 2, TECH_ENGINEERING = 2)
 	build_type = PROTOLATHE
 	materials = list(DEFAULT_WALL_MATERIAL = 800)
+	chemicals = list("sacid" = 20)
 	build_path = /obj/item/weapon/computer_hardware/battery_module/advanced
 	sort_string = "VBAAQ"
 
@@ -886,6 +888,7 @@ other types of metals and chemistry for reagents).
 	req_tech = list(TECH_POWER = 3, TECH_ENGINEERING = 3)
 	build_type = PROTOLATHE
 	materials = list(DEFAULT_WALL_MATERIAL = 1600)
+	chemicals = list("sacid" = 40)
 	build_path = /obj/item/weapon/computer_hardware/battery_module/super
 	sort_string = "VBAAR"
 
@@ -895,6 +898,7 @@ other types of metals and chemistry for reagents).
 	req_tech = list(TECH_POWER = 5, TECH_ENGINEERING = 4)
 	build_type = PROTOLATHE
 	materials = list(DEFAULT_WALL_MATERIAL = 3200)
+	chemicals = list("sacid" = 80)
 	build_path = /obj/item/weapon/computer_hardware/battery_module/ultra
 	sort_string = "VBAAS"
 
@@ -904,6 +908,7 @@ other types of metals and chemistry for reagents).
 	req_tech = list(TECH_POWER = 1, TECH_ENGINEERING = 1)
 	build_type = PROTOLATHE
 	materials = list(DEFAULT_WALL_MATERIAL = 200)
+	chemicals = list("sacid" = 5)
 	build_path = /obj/item/weapon/computer_hardware/battery_module/nano
 	sort_string = "VBAAT"
 
@@ -913,6 +918,7 @@ other types of metals and chemistry for reagents).
 	req_tech = list(TECH_POWER = 2, TECH_ENGINEERING = 2)
 	build_type = PROTOLATHE
 	materials = list(DEFAULT_WALL_MATERIAL = 400)
+	chemicals = list("sacid" = 10)
 	build_path = /obj/item/weapon/computer_hardware/battery_module/micro
 	sort_string = "VBAAU"
 
@@ -1053,33 +1059,12 @@ CIRCUITS BELOW
 	build_path = /obj/item/weapon/circuitboard/clonescanner
 	sort_string = "FAGAG"
 
-/datum/design/circuit/resleever
-	name = "neural lace resleever"
-	id = "resleever"
-	req_tech = list(TECH_DATA = 3, TECH_BIO = 3)
-	build_path = /obj/item/weapon/circuitboard/resleever
-	sort_string = "FAGAH"
-
 /datum/design/circuit/crewconsole
 	name = "crew monitoring console"
 	id = "crewconsole"
 	req_tech = list(TECH_DATA = 3, TECH_MAGNET = 2, TECH_BIO = 2)
 	build_path = /obj/item/weapon/circuitboard/crew
 	sort_string = "FAGAI"
-
-/datum/design/circuit/bioprinter
-	name = "bioprinter"
-	id = "bioprinter"
-	req_tech = list(TECH_ENGINEERING = 1, TECH_BIO = 3, TECH_DATA = 3)
-	build_path = /obj/item/weapon/circuitboard/bioprinter
-	sort_string = "FAGAK"
-
-/datum/design/circuit/roboprinter
-	name = "prosthetic organ fabricator"
-	id = "roboprinter"
-	req_tech = list(TECH_ENGINEERING = 2, TECH_DATA = 3)
-	build_path = /obj/item/weapon/circuitboard/roboprinter
-	sort_string = "FAGAM"
 
 /datum/design/circuit/teleconsole
 	name = "teleporter control console"
@@ -1310,8 +1295,14 @@ CIRCUITS BELOW
 	build_path = /obj/item/weapon/airlock_electronics/secure
 	sort_string = "JDAAA"
 
+/datum/design/circuit/ordercomp
+	name = "supply ordering console"
+	id = "ordercomp"
+	build_path = /obj/item/weapon/circuitboard/ordercomp
+	sort_string = "KAAAA"
+
 /datum/design/circuit/supplycomp
-	name = "cargo supply console"
+	name = "supply control console"
 	id = "supplycomp"
 	req_tech = list(TECH_DATA = 3)
 	build_path = /obj/item/weapon/circuitboard/supplycomp
@@ -1724,32 +1715,3 @@ CIRCUITS BELOW
 	id = "cart_captain"
 	build_path = /obj/item/weapon/cartridge/captain
 	sort_string = "VBAAO"
-
-/datum/design/item/airlock_brace
-	name = "airlock brace design"
-	desc = "Special door attachment that can be used to provide extra security."
-	id = "brace"
-	req_tech = list(TECH_ENGINEERING = 3, TECH_MATERIAL = 2)
-	materials = list(DEFAULT_WALL_MATERIAL = 2000, "glass" = 50)
-	build_path = /obj/item/weapon/airlock_brace
-	sort_string = "VBAAP"
-
-/datum/design/item/brace_keycard
-	name = "brace keycard design"
-	desc = "A small card resembling an ID, it can be paired with airlock braces for quick access."
-	id = "bracecard"
-	req_tech = list(TECH_ENGINEERING = 3, TECH_DATA = 2)
-	materials = list(DEFAULT_WALL_MATERIAL = 50, "glass" = 50)
-	chemicals = list("sacid" = 20)
-	build_type = IMPRINTER
-	build_path = /obj/item/weapon/brace_keycard
-	sort_string = "VBAAR"
-
-/datum/design/item/brace_jack
-	name = "maintenance jack design"
-	desc = "A special maintenance tool that can be used to remove airlock braces."
-	id = "bracejack"
-	req_tech = list(TECH_ENGINEERING = 3, TECH_MATERIAL = 2)
-	materials = list(DEFAULT_WALL_MATERIAL = 120)
-	build_path = /obj/item/weapon/crowbar/brace_jack
-	sort_string = "VBAAS"

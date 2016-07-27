@@ -46,7 +46,7 @@
 
 //Flashing everyone
 		if(eye_safety < FLASH_PROTECTION_MODERATE)
-			M.flash_eyes()
+			flick("e_flash", M.flash)
 			M.Stun(2)
 			M.Weaken(10)
 
@@ -102,6 +102,7 @@
 	name = "clusterbang"
 	icon = 'icons/obj/grenade.dmi'
 	icon_state = "clusterbang"
+	loadable = FALSE
 
 /obj/item/weapon/grenade/flashbang/clusterbang/detonate()
 	var/numspawned = rand(4,8)

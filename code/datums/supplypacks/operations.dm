@@ -1,5 +1,6 @@
 /decl/hierarchy/supply_pack/operations
 	name = "Operations"
+	hierarchy_type = /decl/hierarchy/supply_pack/operations
 
 /decl/hierarchy/supply_pack/operations/mule
 	name = "MULEbot Crate"

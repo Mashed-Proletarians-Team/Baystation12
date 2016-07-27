@@ -18,29 +18,29 @@
 	caliber = "38"
 	projectile_type = /obj/item/projectile/bullet/pistol
 
-/obj/item/ammo_casing/c38/rubber
+/obj/item/ammo_casing/c38r
 	desc = "A .38 rubber bullet casing."
+	caliber = "38"
 	projectile_type = /obj/item/projectile/bullet/pistol/rubber
-	icon_state = "r-casing"
-	spent_icon = "r-casing-spent"
 
 /obj/item/ammo_casing/c9mm
 	desc = "A 9mm bullet casing."
 	caliber = "9mm"
 	projectile_type = /obj/item/projectile/bullet/pistol
 
-/obj/item/ammo_casing/c9mm/flash
+/obj/item/ammo_casing/c9mmf
 	desc = "A 9mm flash shell casing."
+	caliber = "9mm"
 	projectile_type = /obj/item/projectile/energy/flash
 
-/obj/item/ammo_casing/c9mm/rubber
+/obj/item/ammo_casing/c9mmr
 	desc = "A 9mm rubber bullet casing."
+	caliber = "9mm"
 	projectile_type = /obj/item/projectile/bullet/pistol/rubber
-	icon_state = "r-casing"
-	spent_icon = "r-casing-spent"
 
-/obj/item/ammo_casing/c9mm/practice
+/obj/item/ammo_casing/c9mmp
 	desc = "A 9mm practice bullet casing."
+	caliber = "9mm"
 	projectile_type = /obj/item/projectile/bullet/pistol/practice
 
 
@@ -49,31 +49,31 @@
 	caliber = ".45"
 	projectile_type = /obj/item/projectile/bullet/pistol/medium
 
-/obj/item/ammo_casing/c45/practice
+/obj/item/ammo_casing/c45p
 	desc = "A .45 practice bullet casing."
+	caliber = ".45"
 	projectile_type = /obj/item/projectile/bullet/pistol/practice
 
-/obj/item/ammo_casing/c45/rubber
+/obj/item/ammo_casing/c45r
 	desc = "A .45 rubber bullet casing."
+	caliber = ".45"
 	projectile_type = /obj/item/projectile/bullet/pistol/rubber
-	icon_state = "r-casing"
-	spent_icon = "r-casing-spent"
 
-/obj/item/ammo_casing/c45/flash
+/obj/item/ammo_casing/c45f
 	desc = "A .45 flash shell casing."
+	caliber = ".45"
 	projectile_type = /obj/item/projectile/energy/flash
 
 /obj/item/ammo_casing/a10mm
 	desc = "A 10mm bullet casing."
 	caliber = "10mm"
-	projectile_type = /obj/item/projectile/bullet/pistol/medium/smg
+	projectile_type = /obj/item/projectile/bullet/pistol/medium
 
 
 /obj/item/ammo_casing/shotgun
 	name = "shotgun slug"
 	desc = "A 12 gauge slug."
 	icon_state = "slshell"
-	spent_icon = "slshell-spent"
 	caliber = "shotgun"
 	projectile_type = /obj/item/projectile/bullet/shotgun
 	matter = list(DEFAULT_WALL_MATERIAL = 360)
@@ -82,7 +82,6 @@
 	name = "shotgun shell"
 	desc = "A 12 gauge shell."
 	icon_state = "gshell"
-	spent_icon = "gshell-spent"
 	projectile_type = /obj/item/projectile/bullet/pellet/shotgun
 	matter = list(DEFAULT_WALL_MATERIAL = 360)
 
@@ -90,7 +89,6 @@
 	name = "shotgun shell"
 	desc = "A blank shell."
 	icon_state = "blshell"
-	spent_icon = "blshell-spent"
 	projectile_type = /obj/item/projectile/bullet/blank
 	matter = list(DEFAULT_WALL_MATERIAL = 90)
 
@@ -98,7 +96,6 @@
 	name = "shotgun shell"
 	desc = "A practice shell."
 	icon_state = "pshell"
-	spent_icon = "pshell-spent"
 	projectile_type = /obj/item/projectile/bullet/shotgun/practice
 	matter = list("metal" = 90)
 
@@ -106,7 +103,6 @@
 	name = "beanbag shell"
 	desc = "A beanbag shell."
 	icon_state = "bshell"
-	spent_icon = "bshell-spent"
 	projectile_type = /obj/item/projectile/bullet/shotgun/beanbag
 	matter = list(DEFAULT_WALL_MATERIAL = 180)
 
@@ -130,7 +126,6 @@
 	name = "flash shell"
 	desc = "A chemical shell used to signal distress or provide illumination."
 	icon_state = "fshell"
-	spent_icon = "fshell-spent"
 	projectile_type = /obj/item/projectile/energy/flash/flare
 	matter = list(DEFAULT_WALL_MATERIAL = 90, "glass" = 90)
 
@@ -138,8 +133,6 @@
 	desc = "A 7.62mm bullet casing."
 	caliber = "a762"
 	projectile_type = /obj/item/projectile/bullet/rifle/a762
-	icon_state = "rifle-casing"
-	spent_icon = "rifle-casing-spent"
 
 /obj/item/ammo_casing/a145
 	name = "shell casing"
@@ -154,11 +147,10 @@
 	desc = "A 5.56mm bullet casing."
 	caliber = "a556"
 	projectile_type = /obj/item/projectile/bullet/rifle/a556
-	icon_state = "rifle-casing"
-	spent_icon = "rifle-casing-spent"
 
-/obj/item/ammo_casing/a556/practice
+/obj/item/ammo_casing/a556p
 	desc = "A 5.56mm practice bullet casing."
+	caliber = "a556"
 	projectile_type = /obj/item/projectile/bullet/rifle/a556/practice
 
 /obj/item/ammo_casing/rocket

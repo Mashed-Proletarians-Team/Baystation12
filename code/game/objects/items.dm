@@ -78,7 +78,7 @@
 
 /obj/item/New()
 	..()
-	if(randpixel && (!pixel_x && !pixel_y) && isturf(loc)) //hopefully this will prevent us from messing with mapper-set pixel_x/y
+	if(randpixel && (!pixel_x && !pixel_y)) //hopefully this will prevent us from messing with mapper-set pixel_x/y
 		pixel_x = rand(-randpixel, randpixel)
 		pixel_y = rand(-randpixel, randpixel)
 
@@ -98,9 +98,6 @@
 
 //Checks if the item is being held by a mob, and if so, updates the held icons
 /obj/item/proc/update_twohanding()
-	update_held_icon()
-
-/obj/item/proc/update_held_icon()
 	if(ismob(src.loc))
 		var/mob/M = src.loc
 		if(M.l_hand == src)
@@ -110,7 +107,7 @@
 
 /obj/item/proc/is_held_twohanded(mob/living/M)
 	var/check_hand
-	if(M.l_hand == src && !M.r_hand)
+	if(M.l_hand == src && !M.r_hand) 
 		check_hand = "r_hand" //item in left hand, check right hand
 	else if(M.r_hand == src && !M.l_hand)
 		check_hand = "l_hand" //item in right hand, check left hand
@@ -232,7 +229,7 @@
 					for(var/obj/item/I in src.loc)
 						if(I.type in rejections) // To limit bag spamming: any given type only complains once
 							continue
-						if(!S.can_be_inserted(I, user))	// Note can_be_inserted still makes noise when the answer is no
+						if(!S.can_be_inserted(I))	// Note can_be_inserted still makes noise when the answer is no
 							rejections += I.type	// therefore full bags are still a little spammy
 							failure = 1
 							continue
@@ -245,7 +242,7 @@
 					else
 						user << "<span class='notice'>You fail to pick anything up with \the [S].</span>"
 
-			else if(S.can_be_inserted(src, user))
+			else if(S.can_be_inserted(src))
 				S.handle_item_insertion(src)
 
 	return
@@ -260,15 +257,7 @@
 /obj/item/proc/dropped(mob/user as mob)
 	if(randpixel)
 		pixel_z = randpixel //an idea borrowed from some of the older pixel_y randomizations. Intended to make items appear to drop at a character
-	if(zoom)
-		zoom(user) //binoculars, scope, etc
-
-	update_twohanding()
-	if(user)
-		if(user.l_hand)
-			user.l_hand.update_twohanding()
-		if(user.r_hand)
-			user.r_hand.update_twohanding()
+	if(zoom) zoom() //binoculars, scope, etc
 
 // called just as an item is picked up (loc is not yet changed)
 /obj/item/proc/pickup(mob/user)
@@ -295,7 +284,7 @@
 	layer = SCREEN_LAYER+0.01
 	if(user.client)	user.client.screen |= src
 	if(user.pulling == src) user.stop_pulling()
-
+	
 	//Update two-handing status
 	var/mob/M = loc
 	if(!istype(M))
@@ -400,7 +389,7 @@ var/list/global/slot_flags_enumeration = list(
 			var/allow = 0
 			if(H.back && istype(H.back, /obj/item/weapon/storage/backpack))
 				var/obj/item/weapon/storage/backpack/B = H.back
-				if(B.can_be_inserted(src,M,1))
+				if(B.can_be_inserted(src,1))
 					allow = 1
 			if(!allow)
 				return 0
@@ -616,11 +605,10 @@ modules/mob/mob_movement.dm if you move you will be zoomed out
 modules/mob/living/carbon/human/life.dm if you die, you will be zoomed out.
 */
 //Looking through a scope or binoculars should /not/ improve your periphereal vision. Still, increase viewsize a tiny bit so that sniping isn't as restricted to NSEW
-/obj/item/proc/zoom(mob/user, var/tileoffset = 14,var/viewsize = 9) //tileoffset is client view offset in the direction the user is facing. viewsize is how far out this thing zooms. 7 is normal view
-	if(!user.client)
-		return
+/obj/item/proc/zoom(var/tileoffset = 14,var/viewsize = 9) //tileoffset is client view offset in the direction the user is facing. viewsize is how far out this thing zooms. 7 is normal view
 
 	var/devicename
+
 	if(zoomdevicename)
 		devicename = zoomdevicename
 	else
@@ -628,53 +616,52 @@ modules/mob/living/carbon/human/life.dm if you die, you will be zoomed out.
 
 	var/cannotzoom
 
-	var/mob/living/carbon/human/H = user
-	if(user.incapacitated(INCAPACITATION_DISABLED))
-		user << "<span class='warning'>You are unable to focus through the [devicename].</span>"
+	if(usr.stat || !(istype(usr,/mob/living/carbon/human)))
+		usr << "You are unable to focus through the [devicename]"
 		cannotzoom = 1
-	else if(!zoom && istype(H) && H.equipment_tint_total >= TINT_MODERATE)
-		user << "<span class='warning'>Your visor gets in the way of looking through the [devicename].</span>"
+	else if(!zoom && global_hud.darkMask[1] in usr.client.screen)
+		usr << "Your visor gets in the way of looking through the [devicename]"
 		cannotzoom = 1
 	else if(!zoom && usr.get_active_hand() != src)
-		user << "<span class='warning'>You are too distracted to look through the [devicename], perhaps if it was in your active hand this might work better.</span>"
+		usr << "You are too distracted to look through the [devicename], perhaps if it was in your active hand this might work better"
 		cannotzoom = 1
 
 	if(!zoom && !cannotzoom)
-		if(user.hud_used.hud_shown)
-			user.toggle_zoom_hud()	// If the user has already limited their HUD this avoids them having a HUD when they zoom in
-		user.client.view = viewsize
+		if(usr.hud_used.hud_shown)
+			usr.toggle_zoom_hud()	// If the user has already limited their HUD this avoids them having a HUD when they zoom in
+		usr.client.view = viewsize
 		zoom = 1
 
 		var/tilesize = 32
 		var/viewoffset = tilesize * tileoffset
 
-		switch(user.dir)
+		switch(usr.dir)
 			if (NORTH)
-				user.client.pixel_x = 0
-				user.client.pixel_y = viewoffset
+				usr.client.pixel_x = 0
+				usr.client.pixel_y = viewoffset
 			if (SOUTH)
-				user.client.pixel_x = 0
-				user.client.pixel_y = -viewoffset
+				usr.client.pixel_x = 0
+				usr.client.pixel_y = -viewoffset
 			if (EAST)
-				user.client.pixel_x = viewoffset
-				user.client.pixel_y = 0
+				usr.client.pixel_x = viewoffset
+				usr.client.pixel_y = 0
 			if (WEST)
-				user.client.pixel_x = -viewoffset
-				user.client.pixel_y = 0
+				usr.client.pixel_x = -viewoffset
+				usr.client.pixel_y = 0
 
-		user.visible_message("\The [user] peers through the [zoomdevicename ? "[zoomdevicename] of [src]" : "[src]"].")
+		usr.visible_message("[usr] peers through the [zoomdevicename ? "[zoomdevicename] of the [src.name]" : "[src.name]"].")
 
 	else
-		user.client.view = world.view
-		if(!user.hud_used.hud_shown)
-			user.toggle_zoom_hud()
+		usr.client.view = world.view
+		if(!usr.hud_used.hud_shown)
+			usr.toggle_zoom_hud()
 		zoom = 0
 
-		user.client.pixel_x = 0
-		user.client.pixel_y = 0
+		usr.client.pixel_x = 0
+		usr.client.pixel_y = 0
 
 		if(!cannotzoom)
-			user.visible_message("[zoomdevicename ? "\The [user] looks up from [src]" : "\The [user] lowers [src]"].")
+			usr.visible_message("[zoomdevicename ? "[usr] looks up from the [src.name]" : "[usr] lowers the [src.name]"].")
 
 	return
 

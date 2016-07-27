@@ -31,8 +31,8 @@
 		)
 
 	var/global/list/possible_say_verbs = list(
-		"Robotic" = list("states","declares","queries"),
-		"Natural" = list("says","yells","asks"),
+		"Robotic" = list("констатирует","оглашает","запрашивает"),
+		"Natural" = list("говорит","вопит","спрашивает"),
 		"Beep" = list("beeps","beeps loudly","boops"),
 		"Chirp" = list("chirps","chirrups","cheeps"),
 		"Feline" = list("purrs","yowls","meows")
@@ -78,7 +78,6 @@
 	var/current_pda_messaging = null
 
 /mob/living/silicon/pai/New(var/obj/item/device/paicard)
-	status_flags |= NO_ANTAG
 	src.loc = paicard
 	card = paicard
 	sradio = new(src)
@@ -98,7 +97,9 @@
 	//PDA
 	pda = new(src)
 	spawn(5)
-		pda.set_owner_rank_job(text("[]", src), "Personal Assistant")
+		pda.ownjob = "Personal Assistant"
+		pda.owner = text("[]", src)
+		pda.name = pda.owner + " (" + pda.ownjob + ")"
 		pda.toff = 1
 	..()
 

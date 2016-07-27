@@ -24,7 +24,6 @@
 
 //Icon stuff
 
-	var/static/list/eye_overlays
 	var/icontype 				//Persistent icontype tracking allows for cleaner icon updates
 	var/module_sprites[0] 		//Used to store the associations between sprite names and sprite index.
 	var/icon_selected = 1		//If icon selection has been completed yet
@@ -147,15 +146,15 @@
 
 	add_robot_verbs()
 
-	hud_list[HEALTH_HUD]      = new /image/hud_overlay('icons/mob/hud.dmi', src, "hudblank")
-	hud_list[STATUS_HUD]      = new /image/hud_overlay('icons/mob/hud.dmi', src, "hudhealth100")
-	hud_list[LIFE_HUD]        = new /image/hud_overlay('icons/mob/hud.dmi', src, "hudhealth100")
-	hud_list[ID_HUD]          = new /image/hud_overlay('icons/mob/hud.dmi', src, "hudblank")
-	hud_list[WANTED_HUD]      = new /image/hud_overlay('icons/mob/hud.dmi', src, "hudblank")
-	hud_list[IMPLOYAL_HUD]    = new /image/hud_overlay('icons/mob/hud.dmi', src, "hudblank")
-	hud_list[IMPCHEM_HUD]     = new /image/hud_overlay('icons/mob/hud.dmi', src, "hudblank")
-	hud_list[IMPTRACK_HUD]    = new /image/hud_overlay('icons/mob/hud.dmi', src, "hudblank")
-	hud_list[SPECIALROLE_HUD] = new /image/hud_overlay('icons/mob/hud.dmi', src, "hudblank")
+	hud_list[HEALTH_HUD]      = image('icons/mob/hud.dmi', src, "hudblank")
+	hud_list[STATUS_HUD]      = image('icons/mob/hud.dmi', src, "hudhealth100")
+	hud_list[LIFE_HUD]        = image('icons/mob/hud.dmi', src, "hudhealth100")
+	hud_list[ID_HUD]          = image('icons/mob/hud.dmi', src, "hudblank")
+	hud_list[WANTED_HUD]      = image('icons/mob/hud.dmi', src, "hudblank")
+	hud_list[IMPLOYAL_HUD]    = image('icons/mob/hud.dmi', src, "hudblank")
+	hud_list[IMPCHEM_HUD]     = image('icons/mob/hud.dmi', src, "hudblank")
+	hud_list[IMPTRACK_HUD]    = image('icons/mob/hud.dmi', src, "hudblank")
+	hud_list[SPECIALROLE_HUD] = image('icons/mob/hud.dmi', src, "hudblank")
 
 /mob/living/silicon/robot/proc/recalculate_synth_capacities()
 	if(!module || !module.synths)
@@ -300,10 +299,6 @@
 
 	// if we've changed our name, we also need to update the display name for our PDA
 	setup_PDA()
-	
-	// Synths aren't in data_core, but are on manifest. Invalidate old one so the
-	// synth shows up.
-	data_core.ResetPDAManifest() 
 
 	//We also need to update name of internal camera.
 	if (camera)
@@ -719,15 +714,7 @@
 /mob/living/silicon/robot/updateicon()
 	overlays.Cut()
 	if(stat == CONSCIOUS)
-		var/eye_icon_state = "eyes-[module_sprites[icontype]]"
-		if(eye_icon_state in icon_states(icon))
-			if(!eye_overlays)
-				eye_overlays = list()
-			var/image/eye_overlay = eye_overlays[eye_icon_state]
-			if(!eye_overlay)
-				eye_overlay = image(icon, eye_icon_state, LIGHTING_LAYER+0.1)
-				eye_overlays[eye_icon_state] = eye_overlay
-			overlays += eye_overlay
+		overlays += "eyes-[module_sprites[icontype]]"
 
 	if(opened)
 		var/panelprefix = custom_sprite ? src.ckey : "ov"

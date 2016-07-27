@@ -3,7 +3,6 @@
 	desc = "Should anything ever go wrong..."
 	icon = 'icons/obj/items.dmi'
 	icon_state = "red_phone"
-	randpixel = 0
 	flags = CONDUCT
 	force = 3.0
 	throwforce = 2.0
@@ -116,28 +115,25 @@
 
 /obj/item/weapon/cane/concealed/attack_self(var/mob/user)
 	if(concealed_blade)
-		user.visible_message("<span class='warning'>[user] has unsheathed \a [concealed_blade] from [src]!</span>", "You unsheathe \the [concealed_blade] from [src].")
+		user.visible_message("<span class='warning'>[user] has unsheathed \a [concealed_blade] from \his [src]!</span>", "You unsheathe \the [concealed_blade] from \the [src].")
 		// Calling drop/put in hands to properly call item drop/pickup procs
 		playsound(user.loc, 'sound/weapons/flipblade.ogg', 50, 1)
 		user.drop_from_inventory(src)
 		user.put_in_hands(concealed_blade)
 		user.put_in_hands(src)
-		concealed_blade = null
-		update_icon()
-		user.update_inv_l_hand()
+		user.update_inv_l_hand(0)
 		user.update_inv_r_hand()
+		concealed_blade = null
 	else
 		..()
 
 /obj/item/weapon/cane/concealed/attackby(var/obj/item/weapon/material/butterfly/W, var/mob/user)
 	if(!src.concealed_blade && istype(W))
-		user.visible_message("<span class='warning'>[user] has sheathed \a [W] into [src]!</span>", "You sheathe \the [W] into [src].")
+		user.visible_message("<span class='warning'>[user] has sheathed \a [W] into \his [src]!</span>", "You sheathe \the [W] into \the [src].")
 		user.drop_from_inventory(W)
 		W.loc = src
 		src.concealed_blade = W
 		update_icon()
-		user.update_inv_l_hand()
-		user.update_inv_r_hand()
 	else
 		..()
 
@@ -145,7 +141,7 @@
 	if(concealed_blade)
 		name = initial(name)
 		icon_state = initial(icon_state)
-		item_state = initial(item_state)
+		item_state = initial(icon_state)
 	else
 		name = "cane shaft"
 		icon_state = "nullrod"
@@ -154,7 +150,6 @@
 /obj/item/weapon/disk
 	name = "disk"
 	icon = 'icons/obj/items.dmi'
-	randpixel = 5
 
 /*
 /obj/item/weapon/game_kit
@@ -398,9 +393,13 @@
 	desc = "What?"
 	gender = PLURAL
 	icon = 'icons/obj/stock_parts.dmi'
-	randpixel = 5
 	w_class = 2.0
 	var/rating = 1
+
+/obj/item/weapon/stock_parts/New()
+	src.pixel_x = rand(-5.0, 5)
+	src.pixel_y = rand(-5.0, 5)
+	..()
 
 //Rank 1
 

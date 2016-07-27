@@ -3,7 +3,6 @@
 	desc = "A bullet casing."
 	icon = 'icons/obj/ammo.dmi'
 	icon_state = "s-casing"
-	randpixel = 10
 	flags = CONDUCT
 	slot_flags = SLOT_BELT | SLOT_EARS
 	throwforce = 1
@@ -13,18 +12,20 @@
 	var/caliber = ""					//Which kind of guns it can be loaded into
 	var/projectile_type					//The bullet type to create when New() is called
 	var/obj/item/projectile/BB = null	//The loaded bullet - make it so that the projectiles are created only when needed?
-	var/spent_icon = "s-casing-spent"
+	var/spent_icon = null
 
 /obj/item/ammo_casing/New()
 	..()
 	if(ispath(projectile_type))
 		BB = new projectile_type(src)
+	pixel_x = rand(-10, 10)
+	pixel_y = rand(-10, 10)
 
 //removes the projectile from the ammo casing
 /obj/item/ammo_casing/proc/expend()
 	. = BB
 	BB = null
-	set_dir(pick(alldirs)) //spin spent casings
+	set_dir(pick(cardinal)) //spin spent casings
 
 	// Aurora forensics port, gunpowder residue.
 	if(leaves_residue)
@@ -105,9 +106,6 @@
 	var/list/icon_keys = list()		//keys
 	var/list/ammo_states = list()	//values
 
-/obj/item/ammo_magazine/box
-	w_class = 3
-
 /obj/item/ammo_magazine/New()
 	..()
 	if(multiple_sprites)
@@ -131,7 +129,7 @@
 			user << "<span class='warning'>[src] is full!</span>"
 			return
 		user.remove_from_mob(C)
-		C.forceMove(src)
+		C.loc = src
 		stored_ammo.Insert(1, C) //add to the head of the list
 		update_icon()
 
@@ -141,8 +139,8 @@
 		return
 	user << "<span class='notice'>You empty [src].</span>"
 	for(var/obj/item/ammo_casing/C in stored_ammo)
-		C.forceMove(user.loc)
-		C.set_dir(pick(alldirs))
+		C.loc = user.loc
+		C.set_dir(pick(cardinal))
 	stored_ammo.Cut()
 	update_icon()
 

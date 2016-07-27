@@ -40,6 +40,7 @@
 /datum/reagent/nutriment/affect_ingest(var/mob/living/carbon/M, var/alien, var/removed)
 	M.heal_organ_damage(0.5 * removed, 0) //what
 
+	if(issmall(M)) removed *= 2 // Small bodymass, more effect from lower volume.
 	adjust_nutrition(M, alien, removed)
 	M.add_chemical_effect(CE_BLOODRESTORE, 4 * removed)
 
@@ -98,13 +99,17 @@
 /datum/reagent/honey/affect_ingest(var/mob/living/carbon/M, var/alien, var/removed)
 	..()
 
+	var/effective_dose = dose
+	if(issmall(M))
+		effective_dose *= 2
+
 	if(alien == IS_UNATHI)
-		if(dose < 2)
-			if(dose == metabolism * 2 || prob(5))
+		if(effective_dose < 2)
+			if(effective_dose == metabolism * 2 || prob(5))
 				M.emote("yawn")
-		else if(dose < 5)
+		else if(effective_dose < 5)
 			M.eye_blurry = max(M.eye_blurry, 10)
-		else if(dose < 20)
+		else if(effective_dose < 20)
 			if(prob(50))
 				M.Weaken(2)
 			M.drowsyness = max(M.drowsyness, 20)
@@ -432,6 +437,9 @@
 	..()
 
 	var/effective_dose = dose/2
+	if(issmall(M))
+		effective_dose *= 2
+
 	if(alien == IS_UNATHI)
 		if(effective_dose < 2)
 			if(effective_dose == metabolism * 2 || prob(5))
@@ -598,16 +606,6 @@
 
 	glass_name = "milk"
 	glass_desc = "White and nutritious goodness!"
-
-/datum/reagent/drink/milk/chocolate
-	name =  "Chocolate Milk"
-	id = "chocolate_milk"
-	description = "A mixture of perfectly healthy milk and delicious chocolate."
-	taste_description = "chocolate milk"
-	color = "#74533b"
-
-	glass_name = "chocolate milk"
-	glass_desc = "Deliciously fattening!"
 
 /datum/reagent/drink/milk/affect_ingest(var/mob/living/carbon/M, var/alien, var/removed)
 	..()
@@ -856,6 +854,9 @@
 	..()
 
 	var/effective_dose = dose/2
+	if(issmall(M))
+		effective_dose *= 2
+
 	if(alien == IS_UNATHI)
 		if(effective_dose < 2)
 			if(effective_dose == metabolism * 2 || prob(5))
@@ -1885,7 +1886,7 @@
 /datum/reagent/ethanol/sbiten
 	name = "Sbiten"
 	id = "sbiten"
-	description = "A spicy Mead! Might be a little hot for the little guys!"
+	description = "A spicy Vodka! Might be a little hot for the little guys!"
 	taste_description = "hot and spice"
 	color = "#FFA371"
 	strength = 15
@@ -1893,7 +1894,7 @@
 	targ_temp = 360
 
 	glass_name = "Sbiten"
-	glass_desc = "A spicy mix of Mead and Spice. Very hot."
+	glass_desc = "A spicy mix of Vodka and Spice. Very hot."
 
 /datum/reagent/ethanol/screwdrivercocktail
 	name = "Screwdriver"

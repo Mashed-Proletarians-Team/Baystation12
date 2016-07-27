@@ -50,13 +50,16 @@ var/datum/uplink/uplink = new()
 	if(!can_buy(U))
 		return
 
+	if(U.CanUseTopic(user, inventory_state) != STATUS_INTERACTIVE)
+		return
+
 	var/cost = cost(U.uses, U)
 
 	var/goods = get_goods(U, get_turf(user), user, extra_args)
 	if(!goods)
 		return
 
-	purchase_log(U, user, cost)
+	purchase_log(U)
 	U.uses -= cost
 	U.used_TC += cost
 	return goods
@@ -93,7 +96,7 @@ var/datum/uplink/uplink = new()
 			var/datum/antagonist/antag = all_antag_types[antag_role]
 			if(antag.is_antagonist(U.uplink_owner))
 				. = min(antag_costs[antag_role], .)
-	return max(1, U ?  U.get_item_cost(src, .) : .)
+	return U ?  U.get_item_cost(src, .) : .
 
 /datum/uplink_item/proc/description()
 	return desc
@@ -105,11 +108,10 @@ var/datum/uplink/uplink = new()
 /datum/uplink_item/proc/log_icon()
 	return
 
-/datum/uplink_item/proc/purchase_log(obj/item/device/uplink/U, var/mob/user, var/cost)
+/datum/uplink_item/proc/purchase_log(obj/item/device/uplink/U)
 	feedback_add_details("traitor_uplink_items_bought", "[src]")
 	log_and_message_admins("used \the [U.loc] to buy \a [src]")
-	if(user)
-		uplink_purchase_repository.add_entry(user.mind, src, cost)
+	U.purchase_log[src] = U.purchase_log[src] + 1
 
 datum/uplink_item/dd_SortValue()
 	return cost(INFINITY, null)
@@ -147,6 +149,20 @@ datum/uplink_item/dd_SortValue()
 /datum/uplink_item/item/log_icon()
 	var/obj/I = path
 	return "\icon[I]"
+
+/********************************
+*                           	*
+*	Abstract Uplink Entries		*
+*                           	*
+********************************/
+/datum/uplink_item/abstract
+	var/static/image/default_abstract_uplink_icon
+
+/datum/uplink_item/abstract/log_icon()
+	if(!default_abstract_uplink_icon)
+		default_abstract_uplink_icon = image('icons/obj/pda.dmi', "pda-syn")
+
+	return "\icon[default_abstract_uplink_icon]"
 
 /****************
 * Support procs *
